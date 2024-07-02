@@ -294,6 +294,55 @@
                 </td>
               </tr>
 
+              <tr onmouseout="mdl_stop()" onmouseover="mdl_start()">
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <div class="one">
+                    <div class="two" id='mdl_image'>
+                      <img src='images/mixdl_overview.png' width="160">
+                    </div>
+                    <img src='images/mixdl_overview.jpg' width="160">
+                  </div>
+                  <script type="text/javascript">
+                    function mdl_start() {
+                      document.getElementById('mdl_image').style.opacity = "1";
+                    }
+
+                    function mdl_stop() {
+                      document.getElementById('mdl_image').style.opacity = "0";
+                    }
+                    mdl_stop()
+                  </script>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <a href="https://reyllama.github.io/MixDL/">
+                    <papertitle>Few-shot Image Generation with Mixup-based Distance Learning
+                    </papertitle>
+                  </a>
+                  <br>
+
+                  <a href="https://scholar.google.com/citations?user=TownIFQAAAAJ&hl=en&oi=ao">Chaerin Kong</a>,
+                  <a href="https://scholar.google.com/citations?user=FbufdJ8AAAAJ&hl=ko">Jeesoo Kim</a>,
+                  Donghoon Han,
+                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+                  <br>
+                  <em>ECCV</em> 2022
+                  <br>
+                  <a href="https://reyllama.github.io/MixDL/">project page</a>
+                  /
+                  <a href="https://github.com/reyllama/mixdl">code</a>
+                  /
+                  <a href="https://arxiv.org/abs/2111.11672">arXiv</a>
+                  <p></p>
+                  <p>
+
+                    nstead of directly combatting memorization for few-shot (n&lt;100) image synthesis, we propose
+                    latent
+                    space smoothing regularizations that empower the generator to produce diverse (perceptually
+                    continuous) set of samples.
+                  </p>
+                </td>
+              </tr>
+
             </tbody>
           </table>
 
