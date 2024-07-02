@@ -300,7 +300,7 @@
                     <div class="two" id='mdl_image'>
                       <img src='images/mixdl_overview.png' width="160">
                     </div>
-                    <img src='images/mixdl_overview.jpg' width="160">
+                    <img src='images/mixdl_overview.png' width="160">
                   </div>
                   <script type="text/javascript">
                     function mdl_start() {
@@ -335,10 +335,100 @@
                   <p></p>
                   <p>
 
-                    nstead of directly combatting memorization for few-shot (n&lt;100) image synthesis, we propose
+                    Instead of directly combatting memorization for few-shot (n&lt;100) image synthesis, we propose
                     latent
                     space smoothing regularizations that empower the generator to produce diverse (perceptually
                     continuous) set of samples.
+                  </p>
+                </td>
+              </tr>
+
+              <tr onmouseout="corr_adv_stop()" onmouseover="corr_adv_start()">
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <div class="one">
+                    <div class="two" id='corr_adv_image'>
+                      <img src='images/corr_adv.png' width="160">
+                    </div>
+                    <img src='images/corr_adv.png' width="160">
+                  </div>
+                  <script type="text/javascript">
+                    function corr_adv_start() {
+                      document.getElementById('mdl_image').style.opacity = "1";
+                    }
+
+                    function corr_adv_stop() {
+                      document.getElementById('mdl_image').style.opacity = "0";
+                    }
+                    corr_adv_stop()
+                  </script>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <papertitle>Correlation-Concealing Adversarial Noise
+                    Injection for Improved Disentanglement in
+                    Label-Based Image Translation
+                  </papertitle>
+
+                  <br>
+
+                  <a href="https://scholar.google.com/citations?user=TownIFQAAAAJ&hl=en&oi=ao">Chaerin Kong</a>,
+                  <a href="https://scholar.google.com/citations?user=FbufdJ8AAAAJ&hl=ko">Jeesoo Kim</a>,
+                  Donghoon Han,
+                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+                  <br>
+                  <em>ECCV</em> 2022
+                  <br>
+                  <a href="https://reyllama.github.io/MixDL/">project page</a>
+                  /
+                  <a href="https://github.com/reyllama/mixdl">code</a>
+                  /
+                  <a href="https://arxiv.org/abs/2111.11672">arXiv</a>
+                  <p></p>
+                  <p>
+                    This study reveals a significant limitation in multi-domain image translation models: the inability
+                    to perform effective recursive translations. The authors propose a simple solution using additive
+                    perturbations during training, which not only addresses this issue but also enhances overall
+                    translation quality.
+                  </p>
+                </td>
+              </tr>
+
+              <tr onmouseout="vfi_stop()" onmouseover="vfi_start()">
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <div class="one">
+                    <div class="two" id='vfi_image'>
+                      <img src='images/vfi.png' width="160">
+                    </div>
+                    <img src='images/vfi.png' width="160">
+                  </div>
+                  <script type="text/javascript">
+                    function vfi_start() {
+                      document.getElementById('vfi_image').style.opacity = "1";
+                    }
+
+                    function vfi_stop() {
+                      document.getElementById('vfi_image').style.opacity = "0";
+                    }
+                    vfi_stop()
+                  </script>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <papertitle>The U-Net based GLOW for Optical-Flow-free Video Interframe Generation
+                  </papertitle>
+                  <br>
+
+                  Saem Park,
+                  Donghoon Han,
+                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+                  <br>
+                  <em>ICPRAM</em> 2022
+                  <br>
+                  <a href="https://arxiv.org/abs/2103.09576">arXiv</a>
+                  <p></p>
+                  <p>
+                    This study presents a new method for video frame interpolation using an invertible U-Net based
+                    Generative Flow, avoiding optical flow techniques. The approach maintains temporal consistency and
+                    image quality, offering a innovative baseline for video interpolation without traditional
+                    limitations.
                   </p>
                 </td>
               </tr>
