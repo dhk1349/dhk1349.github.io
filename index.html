@@ -111,49 +111,55 @@
             style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
             <tbody>
 
-              <!--<tr onmouseout="dreamfusion_stop()" onmouseover="dreamfusion_start()"  bgcolor="#ffffd0">-->
-              <!--  <td style="padding:20px;width:25%;vertical-align:middle">-->
-              <!--    <div class="one">-->
-              <!--      <div class="two" id='dreamfusion_image'><video  width=100% height=100% muted autoplay loop>-->
-              <!--      <source src="images/dreamfusion.mp4" type="video/mp4">-->
-              <!--      Your browser does not support the video tag.-->
-              <!--      </video></div>-->
-              <!--      <img src='images/dreamfusion.jpg' width="160">-->
-              <!--    </div>-->
-              <!--    <script type="text/javascript">-->
-              <!--      function dreamfusion_start() {-->
-              <!--        document.getElementById('dreamfusion_image').style.opacity = "1";-->
-              <!--      }-->
+              <tr onmouseout="merlin_stop()" onmouseover="merlin_start()">
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <div class="one">
+                    <div class="two" id='merlin_image'>
+                      <img src='images/merlin1.pdf' width="160">
+                    </div>
+                    <img src='images/merlin2.pdf' width="160">
+                  </div>
+                  <script type="text/javascript">
+                    function merlin_start() {
+                      document.getElementById('merlin_image').style.opacity = "1";
+                    }
 
-              <!--      function dreamfusion_stop() {-->
-              <!--        document.getElementById('dreamfusion_image').style.opacity = "0";-->
-              <!--      }-->
-              <!--      dreamfusion_stop()-->
-              <!--    </script>-->
-              <!--  </td>-->
-              <!--  <td style="padding:20px;width:75%;vertical-align:middle">-->
-              <!--    <a href="https://dreamfusion3d.github.io/">-->
-              <!--      <papertitle>DreamFusion: Text-to-3D using 2D Diffusion</papertitle>-->
-              <!--    </a>-->
-              <!--    <br>-->
-              <!--    <a href="https://cs.stanford.edu/~poole/">Ben Poole</a>,-->
-              <!--    <a href="https://www.ajayj.com/">Ajay Jain</a>,-->
-              <!--    <strong>Jonathan T. Barron</strong>,-->
-              <!--		<a href="https://bmild.github.io/">Ben Mildenhall</a>-->
-              <!--    <br>-->
-              <!--    <em>ICLR</em>, 2023 &nbsp <font color="red"><strong>(Oral Presentation, Outstanding Paper Award)</strong></font>-->
-              <!--    <br>-->
-              <!--    <a href="https://dreamfusion3d.github.io/">project page</a>-->
-              <!--    /-->
-              <!--    <a href="https://arxiv.org/abs/2209.14988">arXiv</a>-->
-              <!--    /-->
-              <!--    <a href="https://dreamfusion3d.github.io/gallery.html">gallery</a>-->
-              <!--    <p></p>-->
-              <!--    <p>-->
-              <!--    We optimize a NeRF from scratch using a pretrained text-to-image diffusion model to do text-to-3D generative modeling.-->
-              <!--    </p>-->
-              <!--  </td>-->
-              <!--</tr>-->
+                    function merlin_stop() {
+                      document.getElementById('merlin_image').style.opacity = "0";
+                    }
+                    merlin_stop()
+                  </script>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <a href="https://arxiv.org/abs/2407.12508">
+                    <papertitle>MERLIN: Multimodal Embedding Refinement via LLM-based Iterative Navigation for
+                      Text-Video Retrieval-Rerank Pipeline</papertitle>
+                  </a>
+                  <br>
+                  Donghoon Han*,
+                  <a href="https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao">Eunhwan Park*</a>,
+                  Gisang Lee*,
+                  Adam Lee,
+                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+                  <br>
+                  <em>Under Review</em>
+                  <br>
+                  <!--     <a href="https://shawn615.github.io/flipnerf">project page</a> -->
+                  <!--      / -->
+                  <!--     <a href="https://github.com/shawn615/FlipNeRF">code</a> -->
+                  <!--      / -->
+                  <!--     <a href="https://youtu.be/_XNsRxzaPjw">video</a> -->
+                  <!--      / -->
+                  <a href="https://arxiv.org/abs/2407.12508">arXiv</a>
+                  <p></p>
+                  <p>
+                    MERLIN leverages LLMs in a training-free, iterative feedback pipeline to refine text-video
+                    retrieval, significantly enhancing alignment between user queries and video content, with boosted
+                    improvements in Recall@1 across datasets.
+                  </p>
+                </td>
+              </tr>
+
               <tr onmouseout="hlclip_stop()" onmouseover="hlclip_start()">
                 <td style="padding:20px;width:25%;vertical-align:middle">
                   <div class="one">
