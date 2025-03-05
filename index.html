@@ -117,6 +117,106 @@
             style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
             <tbody>
 
+              <tr onmouseout="cachefocus_stop()" onmouseover="cachefocus_start()">
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <div class="one">
+                    <div class="two" id='cachefocus_image'>
+                      <img src='images/cachefocus1.png' width="160">
+                    </div>
+                    <img src='images/cachefocus2.png' width="160">
+                  </div>
+                  <script type="text/javascript">
+                    function cachefocus_start() {
+                      document.getElementById('cachefocus_image').style.opacity = "1";
+                    }
+
+                    function cachefocus_stop() {
+                      document.getElementById('cachefocus_image').style.opacity = "0";
+                    }
+                    cachefocus_stop()
+                  </script>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <a href="https://arxiv.org/abs/2502.11101">
+                    <papertitle><i>CacheFocus</i>: Dynamic Cache Re-Positioning for Efficient
+                      Retrieval-Augmented Generation</papertitle>
+                  </a>
+                  <br>
+                  Kun-Hui Lee*,
+                  <a href="https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao">Eunhwan Park*</a>,
+                  Donghoon Han,
+                  <a href="https://scholar.google.com/citations?user=vZB0BiQAAAAJ&hl=ko&authuser=2">Seung-Hoon Na</a>
+                  <br>
+                  <em>Under Review</em>
+                  <br>
+                  <!--     <a href="https://shawn615.github.io/flipnerf">project page</a> -->
+                  <!--      / -->
+                  <!--     <a href="https://github.com/shawn615/FlipNeRF">code</a> -->
+                  <!--      / -->
+                  <!--     <a href="https://youtu.be/_XNsRxzaPjw">video</a> -->
+                  <!--      / -->
+                  <a href="https://arxiv.org/abs/2502.11101">arXiv</a>
+                  <p></p>
+                  <p>
+                    CacheFocus improves long-context handling in LLMs by optimizing cache reuse and reducing inference
+                    latency without additional training. It introduces Layer-Adaptive Cache Pruning and Adaptive
+                    Positional Allocation to enhance efficiency and mitigate performance degradation. Experiments show
+                    that CacheFocus outperforms existing methods, maintaining strong performance even with extended
+                    input lengths.
+                  </p>
+                </td>
+              </tr>
+
+              <tr onmouseout="gail_stop()" onmouseover="gail_start()">
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <div class="one">
+                    <div class="two" id='gail_image'>
+                      <img src='images/gail1.png' width="160">
+                    </div>
+                    <img src='images/gail2.png' width="160">
+                  </div>
+                  <script type="text/javascript">
+                    function gail_start() {
+                      document.getElementById('gail_image').style.opacity = "1";
+                    }
+
+                    function gail_stop() {
+                      document.getElementById('gail_image').style.opacity = "0";
+                    }
+                    gail_stop()
+                  </script>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <a href="https://www.sciencedirect.com/science/article/abs/pii/S095741742500675X?via%3Dihub">
+                    <papertitle>Layerwise-priority-based gradient adjustment for few-shot learning</papertitle>
+                  </a>
+                  <br>
+                  <a href="https://scholar.google.co.kr/citations?user=mzFEJVIAAAAJ&hl=ko">Jangho Kum</a>,
+                  Junhoo Lee,
+                  Donghoon Han,
+                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+                  <br>
+                  <em>Expert Systems with Applications 2025</em>
+                  <br>
+                  <!--     <a href="https://shawn615.github.io/flipnerf">project page</a> -->
+                  <!--      / -->
+                  <!--     <a href="https://github.com/shawn615/FlipNeRF">code</a> -->
+                  <!--      / -->
+                  <!--     <a href="https://youtu.be/_XNsRxzaPjw">video</a> -->
+                  <!--      / -->
+                  <a href="https://www.sciencedirect.com/science/article/abs/pii/S095741742500675X?via%3Dihub">paper</a>
+                  /
+                  <a href="https://drive.google.com/file/d/1zkn2M_VEXRzzdBediIrJz4PhXN8uYEJ1/view?usp=sharing">code</a>
+                  <p></p>
+                  <p>
+                    GAIL (Gradient Adjustment in Inner Loop) improves few-shot learning by adjusting per-layer gradient
+                    updates based on priority, enhancing task adaptation. Unlike prior methods that either freeze or
+                    selectively update layers, GAIL aligns gradients across tasks for better convergence. Experiments
+                    show that GAIL outperforms existing inner-loop adaptation techniques in both speed and accuracy.
+                  </p>
+                </td>
+              </tr>
+
               <tr onmouseout="merlin_stop()" onmouseover="merlin_start()">
                 <td style="padding:20px;width:25%;vertical-align:middle">
                   <div class="one">
@@ -166,352 +266,407 @@
                   </p>
                 </td>
               </tr>
-
-              <tr onmouseout="hlclip_stop()" onmouseover="hlclip_start()">
-                <td style="padding:20px;width:25%;vertical-align:middle">
-                  <div class="one">
-                    <div class="two" id='hlclip_image'>
-                      <img src='images/hlclip.png' width="160">
-                    </div>
-                    <img src='images/hlclip.png' width="160">
-                  </div>
-                  <script type="text/javascript">
-                    function hlclip_start() {
-                      document.getElementById('hlclip_image').style.opacity = "1";
-                    }
-
-                    function hlclip_stop() {
-                      document.getElementById('hlclip_image').style.opacity = "0";
-                    }
-                    hlclip_stop()
-                  </script>
-                </td>
-                <td style="padding:20px;width:75%;vertical-align:middle">
-                  <a
-                    href="https://openaccess.thecvf.com/content/CVPR2024W/ELVM/papers/Han_Unleash_the_Potential_of_CLIP_for_Video_Highlight_Detection_CVPRW_2024_paper.pdf">
-                    <papertitle>Unleash the Potential of CLIP for Video Highlight Detection</papertitle>
-                  </a>
-                  <br>
-                  Donghoon Han*,
-                  <a href="https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao">Seunghyeon Seo*</a>,
-                  Eunhwan Park,
-                  SeongUk Nam,
-                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
-                  <br>
-                  <em>CVPR</em> 2024 Workshop on Efficient Large Vision Models
-                  <br>
-                  <!--     <a href="https://shawn615.github.io/flipnerf">project page</a> -->
-                  <!--      / -->
-                  <!--     <a href="https://github.com/shawn615/FlipNeRF">code</a> -->
-                  <!--      / -->
-                  <!--     <a href="https://youtu.be/_XNsRxzaPjw">video</a> -->
-                  <!--      / -->
-                  <a href="https://arxiv.org/abs/2404.01745">arXiv</a>
-                  <p></p>
-                  <p>
-                    We leverage the pre-trained multimodal model CLIP to achieve state-of-the-art performance in video
-                    highlight detection by fine-tuning the encoder and integrating a novel saliency pooling technique.
-                  </p>
-                </td>
-              </tr>
-
-              <tr onmouseout="concatplexer_stop()" onmouseover="concatplexer_start()">
-                <td style="padding:20px;width:25%;vertical-align:middle">
-                  <div class="one">
-                    <div class="two" id='concatplexer_image'>
-                      <img src='images/concatplexer_after.png' width="160">
-                    </div>
-                    <img src='images/concatplexer_before.png' width="160">
-                  </div>
-                  <script type="text/javascript">
-                    function concatplexer_start() {
-                      document.getElementById('concatplexer_image').style.opacity = "1";
-                    }
-
-                    function concatplexer_stop() {
-                      document.getElementById('concatplexer_image').style.opacity = "0";
-                    }
-                    concatplexer_stop()
-                  </script>
-                </td>
-                <td style="padding:20px;width:75%;vertical-align:middle">
-                  <a href="https://arxiv.org/abs/2308.11199">
-                    <papertitle>ConcatPlexer: Additional Dim1 Batching for Faster ViTs</papertitle>
-                  </a>
-                  <br>
-                  Donghoon Han,
-                  <a href="https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao">Seunghyeon Seo</a>,
-                  <a href="https://scholar.google.com/citations?user=2kW3474AAAAJ&hl=en&oi=ao">DongHyeon Jeon</a>,
-                  <a href="https://scholar.google.com/citations?hl=en&user=-EtUt1wAAAAJ">Jiho Jang</a>,
-                  <a href="https://scholar.google.com/citations?user=TownIFQAAAAJ&hl=en&oi=ao">Chaerin Kong</a>,
-                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
-                  <br>
-                  <em>NeurIPS</em> 2023 Workshop on Advancing Neural Network Training &nbsp <font color="red">
-                    <strong>(Oral)</strong>
-                  </font>
-                  <br>
-                  <a href="https://arxiv.org/abs/2308.11199">arXiv</a>
-                  <p></p>
-                  <p>
-                    We expedite ViT inference by concatenating abstract visual tokens from multiple images along dim=1
-                    and processing them collectively.
-                  </p>
-                </td>
-              </tr>
-
-              <tr onmouseout="mixnerf_stop()" onmouseover="mixnerf_start()">
-                <td style="padding:20px;width:25%;vertical-align:middle">
-                  <div class="one">
-                    <div class="two" id='mixnerf_image'>
-                      <img src='images/mixnerf_after.jpg' width="160">
-                    </div>
-                    <img src='images/mixnerf_before.jpg' width="160">
-                  </div>
-                  <script type="text/javascript">
-                    function mixnerf_start() {
-                      document.getElementById('mixnerf_image').style.opacity = "1";
-                    }
-
-                    function mixnerf_stop() {
-                      document.getElementById('mixnerf_image').style.opacity = "0";
-                    }
-                    mixnerf_stop()
-                  </script>
-                </td>
-                <td style="padding:20px;width:75%;vertical-align:middle">
-                  <a href="https://shawn615.github.io/mixnerf">
-                    <papertitle>MixNeRF: Modeling a Ray with Mixture Density for Novel View Synthesis from Sparse Inputs
-                    </papertitle>
-                  </a>
-                  <br>
-                  <a href="https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao">Seunghyeon Seo</a>,
-                  Donghoon Han*,
-                  <a href="https://yeonjin-chang.github.io/">Yeonjin Chang*</a>,
-                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
-                  <br>
-                  <em>CVPR</em> 2023 &nbsp <font color="red"><strong>(Qualcomm Innovation Fellowship Korea 2023
-                      Winner)</strong></font>
-                  <br>
-                  <a href="https://shawn615.github.io/mixnerf">project page</a>
-                  /
-                  <a href="https://github.com/shawn615/MixNeRF">code</a>
-                  /
-                  <a href="https://youtu.be/PXljJordbFk">video</a>
-                  /
-                  <a href="https://arxiv.org/abs/2302.08788">arXiv</a>
-                  <p></p>
-                  <p>
-                    We model a ray with mixture density model, leading to efficient learning of density distribution
-                    with sparse inputs, and propose an effective auxiliary task of ray depth estimation for few-shot
-                    novel view synthesis.
-                  </p>
-                </td>
-              </tr>
-
-              <tr onmouseout="mdl_stop()" onmouseover="mdl_start()">
-                <td style="padding:20px;width:25%;vertical-align:middle">
-                  <div class="one">
-                    <div class="two" id='mdl_image'>
-                      <img src='images/mixdl_overview.png' width="160">
-                    </div>
-                    <img src='images/mixdl_overview.png' width="160">
-                  </div>
-                  <script type="text/javascript">
-                    function mdl_start() {
-                      document.getElementById('mdl_image').style.opacity = "1";
-                    }
-
-                    function mdl_stop() {
-                      document.getElementById('mdl_image').style.opacity = "0";
-                    }
-                    mdl_stop()
-                  </script>
-                </td>
-                <td style="padding:20px;width:75%;vertical-align:middle">
-                  <a href="https://reyllama.github.io/MixDL/">
-                    <papertitle>Few-shot Image Generation with Mixup-based Distance Learning
-                    </papertitle>
-                  </a>
-                  <br>
-
-                  <a href="https://scholar.google.com/citations?user=TownIFQAAAAJ&hl=en&oi=ao">Chaerin Kong</a>,
-                  <a href="https://scholar.google.com/citations?user=FbufdJ8AAAAJ&hl=ko">Jeesoo Kim</a>,
-                  Donghoon Han,
-                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
-                  <br>
-                  <em>ECCV</em> 2022
-                  <br>
-                  <a href="https://reyllama.github.io/MixDL/">project page</a>
-                  /
-                  <a href="https://github.com/reyllama/mixdl">code</a>
-                  /
-                  <a href="https://arxiv.org/abs/2111.11672">arXiv</a>
-                  <p></p>
-                  <p>
-
-                    Instead of directly combatting memorization for few-shot (n&lt;100) image synthesis, we propose
-                    latent
-                    space smoothing regularizations that empower the generator to produce diverse (perceptually
-                    continuous) set of samples.
-                  </p>
-                </td>
-              </tr>
-
-              <tr onmouseout="corr_adv_stop()" onmouseover="corr_adv_start()">
-                <td style="padding:20px;width:25%;vertical-align:middle">
-                  <div class="one">
-                    <div class="two" id='corr_adv_image'>
-                      <img src='images/corr_adv.png' width="160">
-                    </div>
-                    <img src='images/corr_adv.png' width="160">
-                  </div>
-                  <script type="text/javascript">
-                    function corr_adv_start() {
-                      document.getElementById('mdl_image').style.opacity = "1";
-                    }
-
-                    function corr_adv_stop() {
-                      document.getElementById('mdl_image').style.opacity = "0";
-                    }
-                    corr_adv_stop()
-                  </script>
-                </td>
-                <td style="padding:20px;width:75%;vertical-align:middle">
-                  <papertitle>Correlation-Concealing Adversarial Noise
-                    Injection for Improved Disentanglement in
-                    Label-Based Image Translation
-                  </papertitle>
-
-                  <br>
-                  <a href="https://scholar.google.com/citations?user=R5Q2b2UAAAAJ&hl=ko&authuser=2">Seonguk Park</a>,
-                  Jookyung Song,
-                  Donghoon Han,
-                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
-                  <br>
-                  <em>IEEE Access</em> 2023
-                  <br>
-                  <a href="https://ieeexplore.ieee.org/abstract/document/10063866">paper link</a>
-                  <p></p>
-                  <p>
-                    This study reveals a significant limitation in multi-domain image translation models: the inability
-                    to perform effective recursive translations. The authors propose a simple solution using additive
-                    perturbations during training, which not only addresses this issue but also enhances overall
-                    translation quality.
-                  </p>
-                </td>
-              </tr>
-
-              <tr onmouseout="vfi_stop()" onmouseover="vfi_start()">
-                <td style="padding:20px;width:25%;vertical-align:middle">
-                  <div class="one">
-                    <div class="two" id='vfi_image'>
-                      <img src='images/vfi.png' width="160">
-                    </div>
-                    <img src='images/vfi.png' width="160">
-                  </div>
-                  <script type="text/javascript">
-                    function vfi_start() {
-                      document.getElementById('vfi_image').style.opacity = "1";
-                    }
-
-                    function vfi_stop() {
-                      document.getElementById('vfi_image').style.opacity = "0";
-                    }
-                    vfi_stop()
-                  </script>
-                </td>
-                <td style="padding:20px;width:75%;vertical-align:middle">
-                  <papertitle>The U-Net based GLOW for Optical-Flow-free Video Interframe Generation
-                  </papertitle>
-                  <br>
-
-                  Saem Park,
-                  Donghoon Han,
-                  <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
-                  <br>
-                  <em>ICPRAM</em> 2022
-                  <br>
-                  <a href="https://arxiv.org/abs/2103.09576">arXiv</a>
-                  <p></p>
-                  <p>
-                    This study presents a new method for video frame interpolation using an invertible U-Net based
-                    Generative Flow, avoiding optical flow techniques. The approach maintains temporal consistency and
-                    image quality, offering a innovative baseline for video interpolation without traditional
-                    limitations.
-                  </p>
-                </td>
-              </tr>
-
-            </tbody>
-          </table>
-
-
-          <!--        <table width="100%" align="center" border="0" cellspacing="0" cellpadding="20"><tbody>-->
-          <!--          <tr>-->
-          <!--            <td>-->
-          <!--              <heading>Misc</heading>-->
-          <!--            </td>-->
-          <!--          </tr>-->
-          <!--        </tbody></table>-->
-          <!--        <table width="100%" align="center" border="0" cellpadding="20"><tbody>-->
-          <!--					-->
-          <!--          <tr>-->
-          <!--            <td style="padding:20px;width:25%;vertical-align:middle"><img src="images/cvf.jpg"></td>-->
-          <!--            <td width="75%" valign="center">-->
-          <!--              <a href="https://cvpr2022.thecvf.com/area-chairs">Area Chair, CVPR 2022</a>-->
-          <!--              <br>-->
-          <!--              <a href="http://cvpr2021.thecvf.com/area-chairs">Area Chair & Longuet-Higgins Award Committee Member, CVPR 2021</a>-->
-          <!--              <br>-->
-          <!--              <a href="http://cvpr2019.thecvf.com/area_chairs">Area Chair, CVPR 2019</a>-->
-          <!--              <br>-->
-          <!--              <a href="http://cvpr2018.thecvf.com/organizers/area_chairs">Area Chair, CVPR 2018</a>-->
-          <!--            </td>-->
-          <!--          </tr>-->
-          <!--          <tr>-->
-          <!--            <td style="padding:20px;width:25%;vertical-align:middle">-->
-          <!--              <img src="images/cs188.jpg" alt="cs188">-->
-          <!--            </td>-->
-          <!--            <td width="75%" valign="center">-->
-          <!--              <a href="http://inst.eecs.berkeley.edu/~cs188/sp11/announcements.html">Graduate Student Instructor, CS188 Spring 2011</a>-->
-          <!--              <br>-->
-          <!--              <a href="http://inst.eecs.berkeley.edu/~cs188/fa10/announcements.html">Graduate Student Instructor, CS188 Fall 2010</a>-->
-          <!--              <br>-->
-          <!--              <a href="http://aima.cs.berkeley.edu/">Figures, "Artificial Intelligence: A Modern Approach", 3rd Edition</a>-->
-          <!--            </td>-->
-          <!--          </tr>-->
-          <!--					-->
-
-          <!--          <tr>-->
-          <!--            <td align="center" style="padding:20px;width:25%;vertical-align:middle">-->
-          <!--							<heading>Basically <br> Blog Posts</heading>-->
-          <!--            </td>-->
-          <!--            <td width="75%" valign="middle">-->
-          <!--              <a href="https://arxiv.org/abs/2112.11687">Squareplus: A Softplus-Like Algebraic Rectifier</a>-->
-          <!--              <br>-->
-          <!--              <a href="https://arxiv.org/abs/2010.09714">A Convenient Generalization of Schlick's Bias and Gain Functions</a>-->
-          <!--              <br>-->
-          <!--              <a href="https://arxiv.org/abs/1704.07483">Continuously Differentiable Exponential Linear Units</a>-->
-          <!--            </td>-->
-          <!--          </tr>-->
-          <!--					-->
-          <!--					-->
-          <!--        </tbody></table>-->
-          <table
-            style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-            <tbody>
-              <tr>
-                <td style="padding:0px">
-                  <br>
-                  <p style="text-align:right;font-size:small;">
-                    Thanks for sharing the website template, <a href="https://jonbarron.info/">Jon Barron</a>. :)
-                    <!--                Feel free to steal this website's <a href="https://github.com/jonbarron/jonbarron_website">source code</a>. <strong>Do not</strong> scrape the HTML from this page itself, as it includes analytics tags that you do not want on your own website &mdash; use the github code instead. Also, consider using <a href="https://leonidk.com/">Leonid Keselman</a>'s <a href="https://github.com/leonidk/new_website">Jekyll fork</a> of this page.-->
-                  </p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              <papertitle>MERLIN: Multimodal Embedding Refinement via LLM-based Iterative Navigation for
+                Text-Video Retrieval-Rerank Pipeline</papertitle>
+              </a>
+              <br>
+              Donghoon Han*,
+              <a href="https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao">Eunhwan Park*</a>,
+              Gisang Lee*,
+              Adam Lee,
+              <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+              <br>
+              <em>EMNLP 2024 Industry Track</em>
+              <br>
+              <!--     <a href="https://shawn615.github.io/flipnerf">project page</a> -->
+              <!--      / -->
+              <!--     <a href="https://github.com/shawn615/FlipNeRF">code</a> -->
+              <!--      / -->
+              <!--     <a href="https://youtu.be/_XNsRxzaPjw">video</a> -->
+              <!--      / -->
+              <a href="https://github.com/dhk1349/MERLIN_text_to_video_search">code</a> /
+              <a href="https://arxiv.org/abs/2407.12508">arXiv</a>
+              <p></p>
+              <p>
+                MERLIN leverages LLMs in a training-free, iterative feedback pipeline to refine text-video
+                retrieval, significantly enhancing alignment between user queries and video content, with boosted
+                improvements in Recall@1 across datasets.
+              </p>
         </td>
       </tr>
+      <papertitle>MERLIN: Multimodal Embedding Refinement via LLM-based Iterative Navigation for
+        Text-Video Retrieval-Rerank Pipeline</papertitle>
+      </a>
+      <br>
+      Donghoon Han*,
+      <a href="https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao">Eunhwan Park*</a>,
+      Gisang Lee*,
+      Adam Lee,
+      <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+      <br>
+      <em>EMNLP 2024 Industry Track</em>
+      <br>
+      <!--     <a href="https://shawn615.github.io/flipnerf">project page</a> -->
+      <!--      / -->
+      <!--     <a href="https://github.com/shawn615/FlipNeRF">code</a> -->
+      <!--      / -->
+      <!--     <a href="https://youtu.be/_XNsRxzaPjw">video</a> -->
+      <!--      / -->
+      <a href="https://github.com/dhk1349/MERLIN_text_to_video_search">code</a> /
+      <a href="https://arxiv.org/abs/2407.12508">arXiv</a>
+      <p></p>
+      <p>
+        MERLIN leverages LLMs in a training-free, iterative feedback pipeline to refine text-video
+        retrieval, significantly enhancing alignment between user queries and video content, with boosted
+        improvements in Recall@1 across datasets.
+      </p>
+      </td>
+      </tr>
+
+      <tr onmouseout="hlclip_stop()" onmouseover="hlclip_start()">
+        <td style="padding:20px;width:25%;vertical-align:middle">
+          <div class="one">
+            <div class="two" id='hlclip_image'>
+              <img src='images/hlclip.png' width="160">
+            </div>
+            <img src='images/hlclip.png' width="160">
+          </div>
+          <script type="text/javascript">
+            function hlclip_start() {
+              document.getElementById('hlclip_image').style.opacity = "1";
+            }
+
+            function hlclip_stop() {
+              document.getElementById('hlclip_image').style.opacity = "0";
+            }
+            hlclip_stop()
+          </script>
+        </td>
+        <td style="padding:20px;width:75%;vertical-align:middle">
+          <a
+            href="https://openaccess.thecvf.com/content/CVPR2024W/ELVM/papers/Han_Unleash_the_Potential_of_CLIP_for_Video_Highlight_Detection_CVPRW_2024_paper.pdf">
+            <papertitle>Unleash the Potential of CLIP for Video Highlight Detection</papertitle>
+          </a>
+          <br>
+          Donghoon Han*,
+          <a href="https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao">Seunghyeon Seo*</a>,
+          Eunhwan Park,
+          SeongUk Nam,
+          <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+          <br>
+          <em>CVPR</em> 2024 Workshop on Efficient Large Vision Models
+          <br>
+          <!--     <a href="https://shawn615.github.io/flipnerf">project page</a> -->
+          <!--      / -->
+          <!--     <a href="https://github.com/shawn615/FlipNeRF">code</a> -->
+          <!--      / -->
+          <!--     <a href="https://youtu.be/_XNsRxzaPjw">video</a> -->
+          <!--      / -->
+          <a href="https://arxiv.org/abs/2404.01745">arXiv</a>
+          <p></p>
+          <p>
+            We leverage the pre-trained multimodal model CLIP to achieve state-of-the-art performance in video
+            highlight detection by fine-tuning the encoder and integrating a novel saliency pooling technique.
+          </p>
+        </td>
+      </tr>
+
+      <tr onmouseout="concatplexer_stop()" onmouseover="concatplexer_start()">
+        <td style="padding:20px;width:25%;vertical-align:middle">
+          <div class="one">
+            <div class="two" id='concatplexer_image'>
+              <img src='images/concatplexer_after.png' width="160">
+            </div>
+            <img src='images/concatplexer_before.png' width="160">
+          </div>
+          <script type="text/javascript">
+            function concatplexer_start() {
+              document.getElementById('concatplexer_image').style.opacity = "1";
+            }
+
+            function concatplexer_stop() {
+              document.getElementById('concatplexer_image').style.opacity = "0";
+            }
+            concatplexer_stop()
+          </script>
+        </td>
+        <td style="padding:20px;width:75%;vertical-align:middle">
+          <a href="https://arxiv.org/abs/2308.11199">
+            <papertitle>ConcatPlexer: Additional Dim1 Batching for Faster ViTs</papertitle>
+          </a>
+          <br>
+          Donghoon Han,
+          <a href="https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao">Seunghyeon Seo</a>,
+          <a href="https://scholar.google.com/citations?user=2kW3474AAAAJ&hl=en&oi=ao">DongHyeon Jeon</a>,
+          <a href="https://scholar.google.com/citations?hl=en&user=-EtUt1wAAAAJ">Jiho Jang</a>,
+          <a href="https://scholar.google.com/citations?user=TownIFQAAAAJ&hl=en&oi=ao">Chaerin Kong</a>,
+          <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+          <br>
+          <em>NeurIPS</em> 2023 Workshop on Advancing Neural Network Training &nbsp <font color="red">
+            <strong>(Oral)</strong>
+          </font>
+          <br>
+          <a href="https://arxiv.org/abs/2308.11199">arXiv</a>
+          <p></p>
+          <p>
+            We expedite ViT inference by concatenating abstract visual tokens from multiple images along dim=1
+            and processing them collectively.
+          </p>
+        </td>
+      </tr>
+
+      <tr onmouseout="mixnerf_stop()" onmouseover="mixnerf_start()">
+        <td style="padding:20px;width:25%;vertical-align:middle">
+          <div class="one">
+            <div class="two" id='mixnerf_image'>
+              <img src='images/mixnerf_after.jpg' width="160">
+            </div>
+            <img src='images/mixnerf_before.jpg' width="160">
+          </div>
+          <script type="text/javascript">
+            function mixnerf_start() {
+              document.getElementById('mixnerf_image').style.opacity = "1";
+            }
+
+            function mixnerf_stop() {
+              document.getElementById('mixnerf_image').style.opacity = "0";
+            }
+            mixnerf_stop()
+          </script>
+        </td>
+        <td style="padding:20px;width:75%;vertical-align:middle">
+          <a href="https://shawn615.github.io/mixnerf">
+            <papertitle>MixNeRF: Modeling a Ray with Mixture Density for Novel View Synthesis from Sparse Inputs
+            </papertitle>
+          </a>
+          <br>
+          <a href="https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao">Seunghyeon Seo</a>,
+          Donghoon Han*,
+          <a href="https://yeonjin-chang.github.io/">Yeonjin Chang*</a>,
+          <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+          <br>
+          <em>CVPR</em> 2023 &nbsp <font color="red"><strong>(Qualcomm Innovation Fellowship Korea 2023
+              Winner)</strong></font>
+          <br>
+          <a href="https://shawn615.github.io/mixnerf">project page</a>
+          /
+          <a href="https://github.com/shawn615/MixNeRF">code</a>
+          /
+          <a href="https://youtu.be/PXljJordbFk">video</a>
+          /
+          <a href="https://arxiv.org/abs/2302.08788">arXiv</a>
+          <p></p>
+          <p>
+            We model a ray with mixture density model, leading to efficient learning of density distribution
+            with sparse inputs, and propose an effective auxiliary task of ray depth estimation for few-shot
+            novel view synthesis.
+          </p>
+        </td>
+      </tr>
+
+      <tr onmouseout="mdl_stop()" onmouseover="mdl_start()">
+        <td style="padding:20px;width:25%;vertical-align:middle">
+          <div class="one">
+            <div class="two" id='mdl_image'>
+              <img src='images/mixdl_overview.png' width="160">
+            </div>
+            <img src='images/mixdl_overview.png' width="160">
+          </div>
+          <script type="text/javascript">
+            function mdl_start() {
+              document.getElementById('mdl_image').style.opacity = "1";
+            }
+
+            function mdl_stop() {
+              document.getElementById('mdl_image').style.opacity = "0";
+            }
+            mdl_stop()
+          </script>
+        </td>
+        <td style="padding:20px;width:75%;vertical-align:middle">
+          <a href="https://reyllama.github.io/MixDL/">
+            <papertitle>Few-shot Image Generation with Mixup-based Distance Learning
+            </papertitle>
+          </a>
+          <br>
+
+          <a href="https://scholar.google.com/citations?user=TownIFQAAAAJ&hl=en&oi=ao">Chaerin Kong</a>,
+          <a href="https://scholar.google.com/citations?user=FbufdJ8AAAAJ&hl=ko">Jeesoo Kim</a>,
+          Donghoon Han,
+          <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+          <br>
+          <em>ECCV</em> 2022
+          <br>
+          <a href="https://reyllama.github.io/MixDL/">project page</a>
+          /
+          <a href="https://github.com/reyllama/mixdl">code</a>
+          /
+          <a href="https://arxiv.org/abs/2111.11672">arXiv</a>
+          <p></p>
+          <p>
+
+            Instead of directly combatting memorization for few-shot (n&lt;100) image synthesis, we propose
+            latent
+            space smoothing regularizations that empower the generator to produce diverse (perceptually
+            continuous) set of samples.
+          </p>
+        </td>
+      </tr>
+
+      <tr onmouseout="corr_adv_stop()" onmouseover="corr_adv_start()">
+        <td style="padding:20px;width:25%;vertical-align:middle">
+          <div class="one">
+            <div class="two" id='corr_adv_image'>
+              <img src='images/corr_adv.png' width="160">
+            </div>
+            <img src='images/corr_adv.png' width="160">
+          </div>
+          <script type="text/javascript">
+            function corr_adv_start() {
+              document.getElementById('mdl_image').style.opacity = "1";
+            }
+
+            function corr_adv_stop() {
+              document.getElementById('mdl_image').style.opacity = "0";
+            }
+            corr_adv_stop()
+          </script>
+        </td>
+        <td style="padding:20px;width:75%;vertical-align:middle">
+          <papertitle>Correlation-Concealing Adversarial Noise
+            Injection for Improved Disentanglement in
+            Label-Based Image Translation
+          </papertitle>
+
+          <br>
+          <a href="https://scholar.google.com/citations?user=R5Q2b2UAAAAJ&hl=ko&authuser=2">Seonguk Park</a>,
+          Jookyung Song,
+          Donghoon Han,
+          <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+          <br>
+          <em>IEEE Access</em> 2023
+          <br>
+          <a href="https://ieeexplore.ieee.org/abstract/document/10063866">paper link</a>
+          <p></p>
+          <p>
+            This study reveals a significant limitation in multi-domain image translation models: the inability
+            to perform effective recursive translations. The authors propose a simple solution using additive
+            perturbations during training, which not only addresses this issue but also enhances overall
+            translation quality.
+          </p>
+        </td>
+      </tr>
+
+      <tr onmouseout="vfi_stop()" onmouseover="vfi_start()">
+        <td style="padding:20px;width:25%;vertical-align:middle">
+          <div class="one">
+            <div class="two" id='vfi_image'>
+              <img src='images/vfi.png' width="160">
+            </div>
+            <img src='images/vfi.png' width="160">
+          </div>
+          <script type="text/javascript">
+            function vfi_start() {
+              document.getElementById('vfi_image').style.opacity = "1";
+            }
+
+            function vfi_stop() {
+              document.getElementById('vfi_image').style.opacity = "0";
+            }
+            vfi_stop()
+          </script>
+        </td>
+        <td style="padding:20px;width:75%;vertical-align:middle">
+          <papertitle>The U-Net based GLOW for Optical-Flow-free Video Interframe Generation
+          </papertitle>
+          <br>
+
+          Saem Park,
+          Donghoon Han,
+          <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+          <br>
+          <em>ICPRAM</em> 2022
+          <br>
+          <a href="https://arxiv.org/abs/2103.09576">arXiv</a>
+          <p></p>
+          <p>
+            This study presents a new method for video frame interpolation using an invertible U-Net based
+            Generative Flow, avoiding optical flow techniques. The approach maintains temporal consistency and
+            image quality, offering a innovative baseline for video interpolation without traditional
+            limitations.
+          </p>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+
+  <!--        <table width="100%" align="center" border="0" cellspacing="0" cellpadding="20"><tbody>-->
+  <!--          <tr>-->
+  <!--            <td>-->
+  <!--              <heading>Misc</heading>-->
+  <!--            </td>-->
+  <!--          </tr>-->
+  <!--        </tbody></table>-->
+  <!--        <table width="100%" align="center" border="0" cellpadding="20"><tbody>-->
+  <!--					-->
+  <!--          <tr>-->
+  <!--            <td style="padding:20px;width:25%;vertical-align:middle"><img src="images/cvf.jpg"></td>-->
+  <!--            <td width="75%" valign="center">-->
+  <!--              <a href="https://cvpr2022.thecvf.com/area-chairs">Area Chair, CVPR 2022</a>-->
+  <!--              <br>-->
+  <!--              <a href="http://cvpr2021.thecvf.com/area-chairs">Area Chair & Longuet-Higgins Award Committee Member, CVPR 2021</a>-->
+  <!--              <br>-->
+  <!--              <a href="http://cvpr2019.thecvf.com/area_chairs">Area Chair, CVPR 2019</a>-->
+  <!--              <br>-->
+  <!--              <a href="http://cvpr2018.thecvf.com/organizers/area_chairs">Area Chair, CVPR 2018</a>-->
+  <!--            </td>-->
+  <!--          </tr>-->
+  <!--          <tr>-->
+  <!--            <td style="padding:20px;width:25%;vertical-align:middle">-->
+  <!--              <img src="images/cs188.jpg" alt="cs188">-->
+  <!--            </td>-->
+  <!--            <td width="75%" valign="center">-->
+  <!--              <a href="http://inst.eecs.berkeley.edu/~cs188/sp11/announcements.html">Graduate Student Instructor, CS188 Spring 2011</a>-->
+  <!--              <br>-->
+  <!--              <a href="http://inst.eecs.berkeley.edu/~cs188/fa10/announcements.html">Graduate Student Instructor, CS188 Fall 2010</a>-->
+  <!--              <br>-->
+  <!--              <a href="http://aima.cs.berkeley.edu/">Figures, "Artificial Intelligence: A Modern Approach", 3rd Edition</a>-->
+  <!--            </td>-->
+  <!--          </tr>-->
+  <!--					-->
+
+  <!--          <tr>-->
+  <!--            <td align="center" style="padding:20px;width:25%;vertical-align:middle">-->
+  <!--							<heading>Basically <br> Blog Posts</heading>-->
+  <!--            </td>-->
+  <!--            <td width="75%" valign="middle">-->
+  <!--              <a href="https://arxiv.org/abs/2112.11687">Squareplus: A Softplus-Like Algebraic Rectifier</a>-->
+  <!--              <br>-->
+  <!--              <a href="https://arxiv.org/abs/2010.09714">A Convenient Generalization of Schlick's Bias and Gain Functions</a>-->
+  <!--              <br>-->
+  <!--              <a href="https://arxiv.org/abs/1704.07483">Continuously Differentiable Exponential Linear Units</a>-->
+  <!--            </td>-->
+  <!--          </tr>-->
+  <!--					-->
+  <!--					-->
+  <!--        </tbody></table>-->
+  <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+    <tbody>
+      <tr>
+        <td style="padding:0px">
+          <br>
+          <p style="text-align:right;font-size:small;">
+            Thanks for sharing the website template, <a href="https://jonbarron.info/">Jon Barron</a>. :)
+            <!--                Feel free to steal this website's <a href="https://github.com/jonbarron/jonbarron_website">source code</a>. <strong>Do not</strong> scrape the HTML from this page itself, as it includes analytics tags that you do not want on your own website &mdash; use the github code instead. Also, consider using <a href="https://leonidk.com/">Leonid Keselman</a>'s <a href="https://github.com/leonidk/new_website">Jekyll fork</a> of this page.-->
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </td>
+  </tr>
   </table>
 </body>
 
