@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html><head lang="en"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>BM25-V</title>
+
+    <meta name="description" content="BM25-V: Sparse Auto-encoder Visual Word Scoring for Image Retrieval">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta property="og:image" content="https://dhk1349.github.io/bm25v/img/pipeline.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dhk1349.github.io/bm25v">
+    <meta property="og:title" content="Visual Words Meet BM25: Sparse Auto-encoder Visual Word Scoring for Image Retrieval">
+    <meta property="og:description" content="We present BM25-V, which applies Okapi BM25 scoring to sparse visual word activations from a Sparse Autoencoder on Vision Transformer patch tokens. BM25-V retrieves high-recall candidates via sparse inverted-index operations at a fraction of the cost of dense search, enabling a two-stage pipeline that recovers near-exact accuracy.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Visual Words Meet BM25: Sparse Auto-encoder Visual Word Scoring for Image Retrieval">
+    <meta name="twitter:description" content="BM25-V applies Okapi BM25 scoring to sparse visual word activations from a Sparse Autoencoder on ViT patch tokens for efficient, interpretable image retrieval.">
+    <meta name="twitter:image" content="https://dhk1349.github.io/bm25v/img/pipeline.png">
+
+    <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;&#x1F50D;&lt;/text&gt;&lt;/svg&gt;">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/app.css">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/app.js"></script>
+
+    <style>
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .result-table th, .result-table td {
+            padding: 8px 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .result-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+        }
+        .result-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        .highlight-row {
+            background-color: #e8f5e9 !important;
+            font-weight: bold;
+        }
+        .method-col {
+            text-align: left !important;
+            font-weight: bold;
+        }
+        .stat-box {
+            display: inline-block;
+            background: #f0f7ff;
+            border: 1px solid #b3d4fc;
+            border-radius: 8px;
+            padding: 15px 25px;
+            margin: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .section-divider {
+            border: 0;
+            height: 1px;
+            background: #e0e0e0;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="header" style="text-align: center; margin: auto;">
+        <div class="row" id="title-row" style="max-width: 100%; margin: 0 auto; display: inline-block">
+            <h2 class="col-md-12 text-center" id="title">
+                <b>Visual Words Meet BM25</b>: Sparse Auto-encoder <br> Visual Word Scoring for Image Retrieval<br>
+                <small>
+                    2026
+                </small>
+            </h2>
+        </div>
+        <div class="row" id="author-row" style="margin:0 auto;">
+            <div class="col-md-12 text-center" style="display: table; margin:1 auto">
+                <table class="author-table" id="author-table">
+                    <tr>
+                        <td>
+                            <a style="text-decoration:none" href="https://dhk1349.github.io/">
+                              Donghoon Han
+                            </a>
+                            <br>D.notitia
+                        </td>
+                        <td>
+                            <a style="text-decoration:none" href="https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao">
+                              Eunhwan Park
+                            </a>
+                            <br>Moreh
+                        </td>
+                        <td>
+                            <a style="text-decoration:none" href="https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao">
+                              Seunghyeon Seo
+                            </a>
+                            <br>Seoul National University
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('author-row').style.maxWidth = document.getElementById("title-row").clientWidth + 'px';
+    </script>
+
+    <div class="container" id="main">
+        <!-- Navigation buttons -->
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3 text-center">
+                <ul class="nav nav-pills nav-justified">
+                    <li>
+                        <a href="#">
+                        <img src="./img/arxiv_logo.png" height="60px">
+                            <h4><strong>Paper</strong></h4>
+                            <p style="font-size:11px; color:#999;">(coming soon)</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dhk1349" target="_blank">
+                        <img src="./img/github.png" height="60px">
+                            <h4><strong>Code</strong></h4>
+                            <p style="font-size:11px; color:#999;">(coming soon)</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Abstract -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Abstract</h3>
+                <p class="text-justify">
+                    Dense image retrieval is accurate but opaque and compute-intensive at scale. We present <b>BM25-V</b>, which applies Okapi BM25 scoring to sparse visual word activations from a Sparse Autoencoder (SAE) on Vision Transformer patch tokens. Visual word frequencies follow a Zipfian distribution across the gallery, making BM25's IDF weighting the principled scoring choice for suppressing pervasive, uninformative visual words and amplifying rare, discriminative ones. BM25-V retrieves high-recall candidates via sparse inverted-index operations at a fraction of the cost of dense search: Recall@200 &ge; 0.993 across all benchmarks, enabling a two-stage pipeline that reranks only <i>K</i>=200 candidates instead of all <i>N</i>, recovering near-exact accuracy (&minus;0.2 pp average across seven benchmarks). An SAE trained once on ImageNet-1K transfers zero-shot to seven fine-grained benchmarks without fine-tuning, and every retrieval decision is attributable to specific visual words with quantified IDF contributions.
+                </p>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Key highlights -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Key Highlights</h3>
+                <div class="text-center">
+                    <div class="stat-box">
+                        <div class="stat-number">&minus;0.2 pp</div>
+                        <div class="stat-label">Two-stage vs. Dense R@1<br>(avg. 7 datasets)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">48&times;</div>
+                        <div class="stat-label">Index compression<br>vs. dense float32</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">50,000&times;</div>
+                        <div class="stat-label">Faster build time<br>vs. HNSW</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">Zero-shot</div>
+                        <div class="stat-label">One SAE &rarr; 7 datasets<br>no fine-tuning</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Method Overview -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Method Overview</h3>
+                <div class="text-justify">
+                    <p>BM25-V bridges the gap between text retrieval and visual search through three key ideas:</p>
+                    <ol>
+                        <li><b>Sparse Visual Words.</b> A frozen SigLIP2 ViT extracts 729 patch-level features (1152-dim each). A Sparse Autoencoder (SAE) projects each patch into a high-dimensional space (18,432 dims) and applies ReLU + top-<i>k</i> sparsification, keeping only <i>k</i>=16 active "visual words" per patch.</li>
+                        <li><b>Term Frequency via Sum-Pooling.</b> Sparse patch vectors are sum-pooled across all patches to produce a single image-level vector. The accumulated activation magnitude naturally serves as term frequency (TF) &mdash; visual words that fire consistently across many patches get higher TF.</li>
+                        <li><b>BM25 Scoring with IDF.</b> Inverse Document Frequency (IDF) is computed from the gallery, down-weighting pervasive background features and amplifying rare discriminative ones. Scoring follows the standard Okapi BM25 formula, operating through sparse matrix multiplication on inverted posting lists.</li>
+                    </ol>
+                    <p>The <b>two-stage pipeline</b> combines BM25-V (fast sparse first stage, top-200 candidates) with dense cosine reranking, recovering near-exact dense accuracy while providing interpretable attribution.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Results -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Main Results</h3>
+                <p class="text-justify">
+                    Cross-domain retrieval: SAE trained on ImageNet-1K, applied zero-shot to all target datasets. The two-stage system matches full dense retrieval within rounding (&minus;0.2 pp average R@1).
+                </p>
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th class="method-col">Method</th>
+                            <th>CUB-200</th>
+                            <th>Cars-196</th>
+                            <th>Aircraft</th>
+                            <th>Pets</th>
+                            <th>Flowers</th>
+                            <th>DTD</th>
+                            <th>Food-101</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="method-col">Dense (cosine)&dagger;</td>
+                            <td>.767</td><td>.922</td><td>.707</td><td>.912</td><td>.989</td><td>.762</td><td>.954</td>
+                        </tr>
+                        <tr>
+                            <td class="method-col">FAISS-HNSW&dagger;</td>
+                            <td>.768</td><td>.922</td><td>.708</td><td>.912</td><td>.989</td><td>.762</td><td>.954</td>
+                        </tr>
+                        <tr>
+                            <td class="method-col">FAISS-IVF+PQ&dagger;</td>
+                            <td>.734</td><td>.897</td><td>.715</td><td>.915</td><td>.941</td><td>.706</td><td>.941</td>
+                        </tr>
+                        <tr style="border-top: 2px solid #333;">
+                            <td class="method-col">BM25-V (ours)</td>
+                            <td>.472</td><td>.715</td><td>.523</td><td>.771</td><td>.954</td><td>.747</td><td>.865</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td class="method-col">Two-stage K=200 (ours)</td>
+                            <td>.755</td><td>.918</td><td>.704</td><td>.911</td><td><b>.991</b></td><td><b>.769</b></td><td>.950</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 12px; color: #888;">
+                    &dagger; Dense-only methods (no interpretability). <b>Bold</b> = two-stage exceeds full dense. R@1 reported.
+                </p>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Zipfian Distribution -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Zipfian Distribution of Visual Words</h3>
+                <div class="text-justify">
+                    <p>
+                        Visual word frequencies follow a power-law (Zipfian) distribution with exponents &alpha; &in; [1.20, 2.32] &mdash; steeper than natural language (&alpha; &approx; 1). This means most visual words are rare and discriminative, while a small "head" of common words acts as visual stop words. BM25's IDF weighting is the principled response to this distribution: it suppresses the common head and amplifies the discriminative tail.
+                    </p>
+                </div>
+                <div class="text-center">
+                    <img src="./img/rank_freq_overlay.png" class="img-responsive" alt="Zipfian rank-frequency distribution" style="max-width: 85%; margin: 0 auto;">
+                </div>
+                <p style="font-size: 12px; color: #888; text-align: center; margin-top: 8px;">
+                    Rank-frequency plot across 7 datasets. Near-parallel lines confirm all datasets share the same Zipfian distributional form.
+                </p>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Interpretability -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Interpretable Retrieval Attribution</h3>
+                <div class="text-justify">
+                    <p>
+                        BM25-V is interpretable by construction: the score for any (query, retrieved) pair decomposes as a sum of IDF-weighted terms, one per shared visual word. Unlike dense retrieval where the match is an opaque inner product, BM25-V attribution is exact and requires no approximation.
+                    </p>
+                </div>
+
+                <h4>Cars-196</h4>
+                <div class="text-center">
+                    <img src="./img/cars196_xai.png" class="img-responsive" alt="Cars-196 XAI attribution">
+                </div>
+                <p style="font-size: 12px; color: #888; text-align: center; margin-top: 8px;">
+                    The highest-IDF shared word (IDF=6.99) activates on the distinctive racing stripe &mdash; a model-specific marking rare across the reference set.
+                </p>
+                <br>
+
+                <h4>CUB-200-2011</h4>
+                <div class="text-center">
+                    <img src="./img/cub200_xai.png" class="img-responsive" alt="CUB-200 XAI attribution">
+                </div>
+                <p style="font-size: 12px; color: #888; text-align: center; margin-top: 8px;">
+                    Matched Baltimore Oriole pairs share a dimension (IDF=5.90) that fires on the orange breast plumage &mdash; the primary field mark used by ornithologists.
+                </p>
+                <br>
+
+                <h4>Describable Textures (DTD)</h4>
+                <div class="text-center">
+                    <img src="./img/dtd_xai.png" class="img-responsive" alt="DTD XAI attribution">
+                </div>
+                <p style="font-size: 12px; color: #888; text-align: center; margin-top: 8px;">
+                    A dimension (IDF=5.40) detects grid intersection points across different materials, capturing geometry across diverse textures.
+                </p>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Visual Word Semantics -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Visual Word Semantics</h3>
+                <div class="text-justify">
+                    <p>
+                        Each SAE dimension encodes a specific visual concept. For high-IDF dimensions, collecting the strongest-activating crops from the reference set reveals visually coherent patterns &mdash; confirming monosemantic encoding.
+                    </p>
+                </div>
+                <div class="text-center">
+                    <img src="./img/cars196_word_semantics.png" class="img-responsive" alt="Visual word semantics grid" style="max-width: 95%; margin: 0 auto;">
+                </div>
+                <p style="font-size: 12px; color: #888; text-align: center; margin-top: 8px;">
+                    Visual word semantics on Cars-196. Each row is one SAE dimension; each cell is a reference-set crop sorted by activation strength. Coherent rows indicate monosemantic dimensions.
+                </p>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Citation -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Citation</h3>
+                <div class="form-group col-md-10 col-md-offset-1">
+                    <textarea id="bibtex" class="form-control" readonly>
+@article{han2026bm25v,
+    title     = {Visual Words Meet BM25: Sparse Auto-encoder Visual Word Scoring for Image Retrieval},
+    author    = {Han, Donghoon and Park, Eunhwan and Seo, Seunghyeon},
+    year      = {2026},
+    note      = {Preprint}
+}</textarea>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body></html>

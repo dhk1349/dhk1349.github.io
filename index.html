@@ -117,6 +117,45 @@
             style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
             <tbody>
 
+              <tr onmouseout="bm25v_stop()" onmouseover="bm25v_start()">
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <div class="one">
+                    <div class="two" id='bm25v_image'>
+                      <img src='images/bm25v_after.png' width="160">
+                    </div>
+                    <img src='images/bm25v_before.png' width="160">
+                  </div>
+                  <script type="text/javascript">
+                    function bm25v_start() {
+                      document.getElementById('bm25v_image').style.opacity = "1";
+                    }
+
+                    function bm25v_stop() {
+                      document.getElementById('bm25v_image').style.opacity = "0";
+                    }
+                    bm25v_stop()
+                  </script>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <a href="https://dhk1349.github.io/bm25v">
+                    <papertitle>Visual Words Meet BM25: Sparse Auto-encoder Visual Word Scoring for Image Retrieval</papertitle>
+                  </a>
+                  <br>
+                  Donghoon Han,
+                  <a href="https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao">Eunhwan Park</a>,
+                  <a href="https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao">Seunghyeon Seo</a>
+                  <br>
+                  <em>Preprint, 2026</em>
+                  <br>
+                  <a href="https://dhk1349.github.io/bm25v">project page</a>
+                  <p></p>
+                  <p>
+                    We apply Okapi BM25 scoring to sparse visual words from a Sparse Autoencoder on ViT patch tokens,
+                    enabling efficient, interpretable image retrieval that matches dense accuracy via a two-stage pipeline.
+                  </p>
+                </td>
+              </tr>
+
               <tr onmouseout="cachefocus_stop()" onmouseover="cachefocus_start()">
                 <td style="padding:20px;width:25%;vertical-align:middle">
                   <div class="one">
