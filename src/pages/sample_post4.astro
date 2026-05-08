@@ -1,0 +1,64 @@
+---
+import BlogPostLayout from '../layouts/BlogPostLayout.astro';
+---
+
+<BlogPostLayout
+  title="Sample post 4 — TIL / quick note"
+  date="2026-05-08"
+  readingTime="2 min read"
+  description="Template for short Today-I-Learned posts: one fact, the proof, the implication. No filler."
+  tags={["til", "template"]}
+>
+  <p>
+    A TIL post has three jobs:
+  </p>
+
+  <ul>
+    <li>State the fact.</li>
+    <li>Prove it.</li>
+    <li>Say why anyone should care.</li>
+  </ul>
+
+  <p>
+    Anything more belongs in a longer post. Keep these under 300 words.
+  </p>
+
+  <h2>The fact</h2>
+
+  <p>
+    PyTorch's <code>torch.compile</code> hits a no-op recompilation cliff if you
+    pass tensors with the same shape but different stride layouts in the same
+    call.
+  </p>
+
+  <h2>The proof</h2>
+
+  <pre><code>import torch
+
+@torch.compile
+def f(x):
+    return x.sum()
+
+a = torch.randn(64, 64).contiguous()
+b = a.t()  # same shape, transposed strides
+print(f(a))  # compiles
+print(f(b))  # *recompiles* — different stride pattern</code></pre>
+
+  <p>
+    Setting <code>TORCHDYNAMO_VERBOSE=1</code> shows the recompilation event;
+    counting them with <code>torch._dynamo.utils.compile_times()</code> confirms.
+  </p>
+
+  <h2>Why it matters</h2>
+
+  <p>
+    For training loops that mix <code>x</code> and <code>x.transpose(...)</code>,
+    you'll silently double compile cost. Cure is either:
+    <code>x = x.contiguous()</code> at the boundary, or marking the dim as
+    dynamic via <code>torch._dynamo.mark_dynamic</code>.
+  </p>
+
+  <p class="footnote">
+    Filed under: things the docs mention but you only learn by getting bitten.
+  </p>
+</BlogPostLayout>

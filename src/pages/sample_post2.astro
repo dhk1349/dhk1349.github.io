@@ -1,0 +1,83 @@
+---
+import BlogPostLayout from '../layouts/BlogPostLayout.astro';
+---
+
+<BlogPostLayout
+  title="Sample post 2 — technical post with code"
+  date="2026-05-08"
+  readingTime="5 min read"
+  description="Template for technical posts with inline code, code blocks, and a small implementation walkthrough."
+  tags={["template", "code", "tutorial"]}
+>
+  <p>
+    Use this template when the post has runnable code. Inline references like
+    <code>torch.nn.Linear</code> or <code>--num-workers=8</code> appear inside
+    <code>&lt;code&gt;</code>; multi-line snippets go in fenced blocks.
+  </p>
+
+  <h2>Setup</h2>
+
+  <p>
+    Before the code, state the dependency surface clearly:
+  </p>
+
+  <pre><code>pip install torch==2.2 transformers==4.41 accelerate</code></pre>
+
+  <p>
+    A short reproducibility note: pin both the framework and the model. Posts that
+    say "I used PyTorch and Transformers" are not reproducible.
+  </p>
+
+  <h2>The core idea</h2>
+
+  <p>
+    The fewer lines, the better the demonstration. Strip imports and boilerplate
+    until only the load-bearing code remains:
+  </p>
+
+  <pre><code>import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model_id = "Qwen/Qwen2.5-7B-Instruct"
+tok = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(
+    model_id, torch_dtype=torch.bfloat16, device_map="auto"
+)
+
+prompt = "Explain BM25 in one sentence."
+ids = tok(prompt, return_tensors="pt").to(model.device)
+with torch.inference_mode():
+    out = model.generate(**ids, max_new_tokens=64, temperature=0.0)
+print(tok.decode(out[0][ids.input_ids.shape[1]:], skip_special_tokens=True))</code></pre>
+
+  <p>
+    Annotate inline if a line is non-obvious. Long comment blocks belong in real
+    code, not blog snippets — the post itself is the comment.
+  </p>
+
+  <h2>What changed and why</h2>
+
+  <ol>
+    <li><strong>Pinned dtype.</strong> Implicit fp32 on Hopper costs 2× memory.</li>
+    <li><strong>Single-token decode.</strong> Greedy here so the example is deterministic.</li>
+    <li><strong>Slice the prompt out.</strong> Otherwise the printed output includes the question.</li>
+  </ol>
+
+  <div class="callout">
+    <p class="callout-title">Note</p>
+    <p>Callouts pull a single sentence out of the flow. Use them sparingly — every callout dilutes every other callout.</p>
+  </div>
+
+  <h2>Performance numbers</h2>
+
+  <p>
+    Always include a measurement. "It works" is not a finding; "it works in 230 ms
+    on an H100, vs. 410 ms before" is.
+  </p>
+
+  <hr />
+
+  <p class="footnote">
+    Footnote: tested on H100 80GB, CUDA 12.4, transformers 4.41.2.
+  </p>
+</BlogPostLayout>

@@ -1,0 +1,91 @@
+---
+import BlogPostLayout from '../layouts/BlogPostLayout.astro';
+---
+
+<BlogPostLayout
+  title="Sample post 3 — paper notes with figures"
+  date="2026-05-08"
+  readingTime="7 min read"
+  description="Template for paper digests / reading notes with figure embeds, blockquotes from the paper, and a structured takeaway list."
+  tags={["template", "paper-notes", "research"]}
+>
+  <p>
+    Use this template when reacting to a paper or technical post. Embed at most
+    one or two figures — readers want <em>your</em> reading, not a re-render.
+    Quote sparingly.
+  </p>
+
+  <h2>The paper in one paragraph</h2>
+
+  <p>
+    Open with a one-paragraph summary that you would tell someone in a hallway.
+    No setup, no preamble, no "in this work the authors propose…". Just the
+    claim.
+  </p>
+
+  <blockquote>
+    <p>
+      We apply Okapi BM25 scoring to sparse visual word activations from a
+      Sparse Autoencoder on Vision Transformer patch tokens, enabling efficient,
+      interpretable image retrieval that matches dense accuracy via a two-stage
+      pipeline.
+    </p>
+  </blockquote>
+
+  <h2>What's new</h2>
+
+  <p>
+    Three things, ordered by how much I think they matter:
+  </p>
+
+  <ol>
+    <li>
+      <strong>Sparse visual words actually behave Zipfian.</strong> If you've
+      worked in IR, this is the key claim — it's why BM25's IDF is the right
+      tool, not a marketing analogy.
+    </li>
+    <li>
+      <strong>Two-stage pipeline recovers near-exact accuracy.</strong> First-stage
+      sparse retrieval at high recall, then dense rerank on the top-200.
+    </li>
+    <li>
+      <strong>Attribution is exact.</strong> No saliency hacks, no Grad-CAM. The
+      score decomposes by visual word.
+    </li>
+  </ol>
+
+  <h2>The figure that does the work</h2>
+
+  <figure>
+    <img src="/bm25v/img/rank_freq_overlay.png" alt="Rank-frequency plot of visual words across 7 datasets" loading="lazy" />
+    <figcaption>
+      Visual word rank-frequency across seven datasets. Near-parallel power-law
+      tails are the entire empirical case for using BM25 over a learned scorer.
+    </figcaption>
+  </figure>
+
+  <p>
+    Pick one figure. The figure should be the one that, if removed, would
+    weaken the paper's argument the most. Almost never the architecture diagram.
+  </p>
+
+  <h2>What I'd want next</h2>
+
+  <ul>
+    <li>Does the Zipfian fit hold on heterogeneous galleries (e.g., LAION-style scale)?</li>
+    <li>Can the SAE be replaced with a TopK ReLU bottleneck and still preserve attribution?</li>
+    <li>What does the latency curve look like at 100M+ images, where HNSW build time becomes the bottleneck?</li>
+  </ul>
+
+  <div class="callout">
+    <p class="callout-title">Hot take</p>
+    <p>The paper's strongest contribution isn't speed — it's making attribution exact. Speed is a side-effect.</p>
+  </div>
+
+  <h2>References</h2>
+
+  <p>
+    Han, Park, Seo. <em>Visual Words Meet BM25</em>. arXiv:2603.05781, 2026.
+    <a href="/bm25v">project</a> · <a href="https://arxiv.org/abs/2603.05781">arXiv</a>
+  </p>
+</BlogPostLayout>

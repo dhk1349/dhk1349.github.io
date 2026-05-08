@@ -1,0 +1,56 @@
+---
+import BlogPostLayout from '../layouts/BlogPostLayout.astro';
+---
+
+<BlogPostLayout
+  title="Sample post 1 — plain prose"
+  date="2026-05-08"
+  readingTime="3 min read"
+  description="The simplest possible blog post: title, date, prose. Use this as the starting template for most writing."
+  tags={["template", "writing"]}
+>
+  <p>
+    This is the simplest blog template — just title, date, and prose. Most posts
+    only need this. Use it for short essays, reading notes, conference takeaways, or
+    anything that's mostly continuous text.
+  </p>
+
+  <p>
+    Paragraphs flow. Inline links look like <a href="https://www.dnotitia.com/">this</a>,
+    and <strong>strong text</strong> reads with the heavier weight reserved for
+    emphasis. <em>Italic</em> for titles, terms-of-art, or restrained accent.
+  </p>
+
+  <h2>A second-level heading</h2>
+
+  <p>
+    The first heading after the hero is an <code>&lt;h2&gt;</code>. Resist the urge
+    to drop straight into <code>&lt;h3&gt;</code>; readers parse hierarchy by
+    counting steps from the title.
+  </p>
+
+  <p>
+    Lists work too:
+  </p>
+
+  <ul>
+    <li>One item per line.</li>
+    <li>Keep them parallel — same grammatical form throughout.</li>
+    <li>If an item needs more than two sentences, it's probably a paragraph.</li>
+  </ul>
+
+  <h3>A subsection</h3>
+
+  <p>
+    Subsections (<code>h3</code>) for the second tier of structure. Don't go deeper
+    than <code>h3</code> on a personal blog — if you need <code>h4</code>, the post
+    is probably two posts.
+  </p>
+
+  <h2>Closing thought</h2>
+
+  <p>
+    End with a single concrete claim or a question. The reader should be able to
+    state, in one sentence, what the post argued. If you can't, neither can they.
+  </p>
+</BlogPostLayout>
