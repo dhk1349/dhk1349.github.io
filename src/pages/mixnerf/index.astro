@@ -1,0 +1,233 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Seunghyeon Seo', href: 'https://shawn615.github.io/', affiliation: 'Seoul National University' },
+  { name: 'Donghoon Han', href: 'https://scholar.google.com/citations?hl=en&user=BKlC7TQAAAAJ', affiliation: 'Seoul National University', equal: true, me: true },
+  { name: 'Yeonjin Chang', href: 'https://yeonjin-chang.github.io/', affiliation: 'Seoul National University', equal: true },
+  { name: 'Nojun Kwak', href: 'http://mipal.snu.ac.kr/index.php/Nojun_Kwak', affiliation: 'Seoul National University' },
+];
+
+const links = [
+  { label: 'arXiv', href: 'https://arxiv.org/abs/2302.08788', meta: '2302.08788' },
+  { label: 'Code', href: 'https://github.com/shawn615/MixNeRF' },
+  { label: 'Video', href: 'https://youtu.be/PXljJordbFk' },
+  { label: 'Project (canonical)', href: 'https://shawn615.github.io/mixnerf' },
+];
+---
+
+<PaperLayout
+  title="MixNeRF"
+  subtitle="Modeling a Ray with Mixture Density for Novel View Synthesis from Sparse Inputs"
+  venue="CVPR 2023"
+  authors={authors}
+  links={links}
+  description="MixNeRF: efficient few-shot novel view synthesis by modeling each ray with a mixture density model, with ray depth as an auxiliary task."
+>
+  <section>
+    <figure>
+      <img src="/mixnerf/img/teaser.png" alt="MixNeRF teaser" loading="lazy" />
+    </figure>
+    <h2>Abstract</h2>
+    <p>
+      Neural Radiance Fields (NeRF) deliver state-of-the-art novel-view synthesis but
+      degrade severely without dense training views. Prior fixes lean on heavy extra
+      training resources, undermining the efficiency premise of sparse-input NeRF. We
+      propose <strong>MixNeRF</strong>, an effective training strategy that models each
+      ray with a mixture density model. MixNeRF estimates the joint distribution of
+      RGB along ray samples as a mixture of distributions, and introduces ray depth
+      estimation as a useful training objective tightly correlated with 3D scene
+      geometry. With regenerated blending weights from estimated depth, robustness to
+      color and viewpoint shifts further improves. MixNeRF outperforms prior
+      state-of-the-art across standard benchmarks while being more training- and
+      inference-efficient.
+    </p>
+  </section>
+
+  <section>
+    <h2>Video</h2>
+    <figure class="video-embed">
+      <iframe
+        src="https://www.youtube.com/embed/PXljJordbFk"
+        title="MixNeRF — CVPR 2023"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Modeling a ray with a mixture density model</h2>
+    <p>
+      MixNeRF estimates the per-pixel RGB distribution along ray samples as a
+      mixture of component distributions. The conventional NeRF outputs at each
+      sample serve as a location parameter and (via the density σ) as the mixing
+      coefficient π; we additionally estimate a scale parameter β.
+    </p>
+    <figure>
+      <img src="/mixnerf/img/mixture_1.png" alt="Mixture component definition" loading="lazy" style="max-width: 60%; margin: 0 auto;" />
+    </figure>
+    <p>The pdf of the mixture model is:</p>
+    <figure>
+      <img src="/mixnerf/img/mixture_2.png" alt="Mixture pdf" loading="lazy" style="max-width: 60%; margin: 0 auto;" />
+    </figure>
+    <p>The mixture coefficient is derived from the density output:</p>
+    <figure>
+      <img src="/mixnerf/img/mixture_3.png" alt="Mixture coefficient from density" loading="lazy" style="max-width: 60%; margin: 0 auto;" />
+    </figure>
+  </section>
+
+  <section>
+    <h2>Depth estimation by mixture density</h2>
+    <p>
+      We propose ray depth estimation as an auxiliary task — defined as the length of
+      the unnormalized ray-direction vector along ray samples — providing direct
+      supervision for the mixture parameters tied to geometry.
+    </p>
+    <figure>
+      <img src="/mixnerf/img/raydepth_1.png" alt="Mixture pdf for depth" loading="lazy" style="max-width: 60%; margin: 0 auto;" />
+    </figure>
+    <p>
+      With π and β jointly optimized via depth and color supervision, MixNeRF
+      becomes more robust to small geometric shifts. Estimated depth then regenerates
+      blending weights — playing the role of pseudo-geometry for adjacent samples
+      without extra training data:
+    </p>
+    <figure>
+      <img src="/mixnerf/img/raydepth_2.png" alt="Regenerated blending weights" loading="lazy" style="max-width: 60%; margin: 0 auto;" />
+    </figure>
+    <p>Color values along the ray are remodeled with the new mixing coefficients:</p>
+    <figure>
+      <img src="/mixnerf/img/raydepth_3.png" alt="Final color modeling" loading="lazy" style="max-width: 60%; margin: 0 auto;" />
+    </figure>
+    <p>
+      No extra inference of unseen views is required, so robustness is gained without
+      meaningful computational overhead.
+    </p>
+  </section>
+
+  <section>
+    <h2>Why mixture density helps</h2>
+    <figure>
+      <img src="/mixnerf/img/weight_dist.png" alt="Weight distribution comparison" loading="lazy" />
+    </figure>
+    <p>
+      For unimodal cases (blue), mip-NeRF underestimates the mode and yields
+      degenerate geometry. RegNeRF and MixNeRF recover unimodal weights, with
+      MixNeRF producing a sharper mode that more closely matches the dense-view
+      reference. For bimodal cases (red), only MixNeRF estimates the distribution
+      successfully — directly improving geometry under limited views.
+    </p>
+  </section>
+
+  <section>
+    <h2>Depth map estimation</h2>
+    <figure>
+      <video
+        src="/mixnerf/video/depth_regnerf_ours.mp4"
+        playsinline
+        autoplay
+        loop
+        muted
+      ></video>
+    </figure>
+    <p>
+      RegNeRF's smoothing prior collapses geometry. MixNeRF learns ray depth via the
+      mixture density model — without smoothing across additional unseen rays — so
+      depth maps come out cleaner and more precise.
+    </p>
+  </section>
+
+  <section>
+    <h2>Efficiency</h2>
+    <figure>
+      <img src="/mixnerf/img/efficiency_1.png" alt="Training-time vs. quality comparison" loading="lazy" />
+    </figure>
+    <p>
+      DietNeRF trains in similar time but is significantly weaker in 3- and 6-view
+      settings. Against RegNeRF, MixNeRF cuts per-scene training time by ~42% under
+      matched view counts by eliminating extra inference for additional unseen rays.
+    </p>
+  </section>
+
+  <section>
+    <h2>Results</h2>
+
+    <h3>DTU 3-view</h3>
+    <div class="video-grid v3">
+      <video src="/mixnerf/video/results_dtu_1.mp4" playsinline autoplay loop muted></video>
+      <video src="/mixnerf/video/results_dtu_2.mp4" playsinline autoplay loop muted></video>
+      <video src="/mixnerf/video/results_dtu_3.mp4" playsinline autoplay loop muted></video>
+    </div>
+
+    <h3>LLFF 3-view</h3>
+    <div class="video-grid v2">
+      <video src="/mixnerf/video/results_llff_1.mp4" playsinline autoplay loop muted></video>
+      <video src="/mixnerf/video/results_llff_2.mp4" playsinline autoplay loop muted></video>
+    </div>
+
+    <h3>Blender 4-view</h3>
+    <div class="video-grid v2">
+      <video src="/mixnerf/video/results_blender_1.mp4" playsinline autoplay loop muted></video>
+      <video src="/mixnerf/video/results_blender_2.mp4" playsinline autoplay loop muted></video>
+    </div>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@InProceedings&#123;Seo_2023_CVPR,
+  author    = &#123;Seo, Seunghyeon and Han, Donghoon and Chang, Yeonjin and Kwak, Nojun&#125;,
+  title     = &#123;MixNeRF: Modeling a Ray With Mixture Density for Novel View Synthesis From Sparse Inputs&#125;,
+  booktitle = &#123;Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)&#125;,
+  month     = &#123;June&#125;,
+  year      = &#123;2023&#125;,
+  pages     = &#123;20659-20668&#125;
+&#125;</pre>
+  </section>
+
+  <section>
+    <h2>Acknowledgements</h2>
+    <p>
+      This work was supported by NRF grant (2021R1A2C3006659) and IITP grants
+      (2021-0-01343, 2022-0-00953) funded by the Korean Government.
+    </p>
+  </section>
+</PaperLayout>
+
+<style>
+  .video-embed {
+    position: relative;
+    padding-top: 56.25%;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    box-shadow: var(--ring-light);
+    background: var(--gray-50);
+    margin: 8px 0;
+  }
+  .video-embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .video-grid {
+    display: grid;
+    gap: 10px;
+    margin: 8px 0 16px;
+  }
+  .video-grid.v2 { grid-template-columns: repeat(2, 1fr); }
+  .video-grid.v3 { grid-template-columns: repeat(3, 1fr); }
+  .video-grid video {
+    width: 100%;
+    height: auto;
+    border-radius: var(--r-md);
+    box-shadow: var(--ring-light);
+    background: var(--gray-50);
+  }
+
+  @media (max-width: 640px) {
+    .video-grid.v2, .video-grid.v3 { grid-template-columns: 1fr; }
+  }
+</style>

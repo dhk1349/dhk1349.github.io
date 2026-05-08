@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Blog · Donghoon Han" description="Notes and writing by Donghoon Han.">
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Writing</p>
+      <h1>Blog</h1>
+      <p class="lede dim">
+        A space for notes on multimodal models, LLM inference efficiency, and
+        whatever I'm reading. Posts will land here soon.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="empty card">
+        <p class="eyebrow">Coming soon</p>
+        <h2>No posts yet.</h2>
+        <p class="dim">
+          I'm setting up writing infrastructure — first posts will arrive on
+          KV-cache compression and long-context strategies. In the meantime,
+          you can find papers on the
+          <a href="/">home page</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .container { max-width: var(--content-max); }
+  .hero { padding: 72px 0 24px; }
+  .lede { font-size: 17px; line-height: 1.7; max-width: 640px; margin: 12px 0 0; }
+
+  .empty {
+    padding: 32px;
+  }
+  .empty h2 { margin-top: 8px; }
+  .empty p { margin-top: 8px; max-width: 520px; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 48px 0 16px; }
+    .empty { padding: 24px; }
+  }
+</style>

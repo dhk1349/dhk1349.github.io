@@ -1,0 +1,94 @@
+---
+const { pathname } = Astro.url;
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+
+<header class="nav">
+  <div class="nav-inner container">
+    <a href="/" class="brand">
+      <span class="brand-mark">DH</span>
+      <span class="brand-name">Donghoon Han</span>
+    </a>
+    <nav class="links" aria-label="Primary">
+      <a href="/" class:list={[{ active: isActive('/') }]}>Home</a>
+      <a href="/blog" class:list={[{ active: isActive('/blog') }]}>Blog</a>
+      <a href="https://github.com/dhk1349/" target="_blank" rel="noopener">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: saturate(180%) blur(8px);
+    -webkit-backdrop-filter: saturate(180%) blur(8px);
+    box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 0px 0px;
+  }
+  .nav-inner {
+    max-width: var(--wide-max);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gray-900);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .brand:hover { text-decoration: none; }
+  .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--r-sm);
+    background: var(--gray-900);
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+  .brand-name {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.32px;
+  }
+  .links {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .links a {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: var(--r-md);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-600);
+    text-decoration: none;
+    transition: color .15s ease, background .15s ease;
+  }
+  .links a:hover {
+    color: var(--gray-900);
+    background: var(--gray-50);
+    text-decoration: none;
+  }
+  .links a.active {
+    color: var(--gray-900);
+    font-weight: 600;
+  }
+
+  @media (max-width: 480px) {
+    .brand-name { display: none; }
+  }
+</style>

@@ -1,0 +1,136 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Donghoon Han', href: 'https://dhk1349.github.io/', equal: true, me: true },
+  { name: 'Seunghyeon Seo', href: 'https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao', equal: true },
+  { name: 'Eunhwan Park', href: 'https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao' },
+  { name: 'SeongUk Nam' },
+  { name: 'Nojun Kwak', href: 'http://mipal.snu.ac.kr/index.php/Nojun_Kwak' },
+];
+
+const links = [
+  { label: 'arXiv', href: 'https://arxiv.org/abs/2404.01745', meta: '2404.01745' },
+  { label: 'Paper (PDF)', href: 'https://openaccess.thecvf.com/content/CVPR2024W/ELVM/papers/Han_Unleash_the_Potential_of_CLIP_for_Video_Highlight_Detection_CVPRW_2024_paper.pdf' },
+];
+---
+
+<PaperLayout
+  title="Unleash the Potential of CLIP"
+  subtitle="for Video Highlight Detection"
+  venue="CVPR 2024 Workshop · Efficient Large Vision Models"
+  authors={authors}
+  links={links}
+  description="HL-CLIP: state-of-the-art video highlight detection by fine-tuning CLIP's last layers and applying saliency pooling — no SlowFast, no DETR."
+>
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      Multimodal pre-trained models have unlocked open-world knowledge across many
+      tasks; the video domain is no exception. We present <strong>Highlight-CLIP
+      (HL-CLIP)</strong>, a method designed to excel at video highlight detection by
+      leveraging the pre-trained knowledge embedded in multimodal encoders. Simply
+      fine-tuning the multimodal encoder together with our <em>saliency pooling</em>
+      technique achieves state-of-the-art on the QVHighlights benchmark.
+    </p>
+  </section>
+
+  <section>
+    <h2>TL;DR</h2>
+    <ul>
+      <li>
+        <strong>Detector-free.</strong> No DETR head, no SlowFast features. Just CLIP
+        with a focused fine-tuning strategy and a lightweight inference-time pooling.
+      </li>
+      <li>
+        <strong>Tune the last two layers.</strong> Only the final two layers of CLIP's
+        vision and text encoders are fine-tuned — preserving pre-trained semantics.
+      </li>
+      <li>
+        <strong>Saliency pooling.</strong> At inference, average predicted saliency
+        across neighboring frames. Robust to per-frame noise without retraining.
+      </li>
+      <li>
+        <strong>SOTA on QVHighlights.</strong> 42.40 mAP / 72.42 HIT@1 on val;
+        41.94 / 70.60 on test — exceeding CG-DETR (40.33 mAP).
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Method</h2>
+    <figure>
+      <img src="/hlclip/img/arch.png" alt="HL-CLIP architecture: dual-encoder fine-tuning with saliency pooling" loading="lazy" />
+      <figcaption>HL-CLIP architecture. Frame embeddings from a fine-tuned CLIP vision encoder are scored against the query embedding via cosine similarity; saliency pooling averages predictions across neighboring frames at inference.</figcaption>
+    </figure>
+
+    <h3>Training</h3>
+    <p>
+      We stack <em>K</em>×<em>N</em> frame–query pairs and supervise with MSE between
+      predicted and ground-truth saliency. Only the last two encoder layers in CLIP
+      receive gradient updates, which preserves the broad pre-trained semantics that
+      make CLIP useful in the first place while specializing the upper layers for the
+      saliency task.
+    </p>
+
+    <h3>Saliency pooling</h3>
+    <p>
+      At inference, we average predicted saliency over a small temporal window
+      around each frame. This trades off marginal localization sharpness for a
+      meaningful gain in robustness — converting per-frame noise into temporally
+      smoothed scores that better match human-rated highlights.
+    </p>
+  </section>
+
+  <section>
+    <h2>Main results — QVHighlights</h2>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Val mAP</th>
+            <th>Val HIT@1</th>
+            <th>Test mAP</th>
+            <th>Test HIT@1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="method">CG-DETR (prior SOTA)</td>
+            <td>40.33</td><td>—</td><td>40.33</td><td>—</td>
+          </tr>
+          <tr class="divider">
+            <td class="method">HL-CLIP-2</td>
+            <td>40.00</td><td>—</td><td>—</td><td>—</td>
+          </tr>
+          <tr class="highlight">
+            <td class="method">HL-CLIP-2 + Saliency Pooling</td>
+            <td>42.40</td><td>72.42</td><td>41.94</td><td>70.60</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">Saliency pooling alone contributes +2.40 mAP at validation — the design choice that turned the approach into SOTA.</p>
+  </section>
+
+  <section>
+    <h2>Limitation</h2>
+    <p>
+      HL-CLIP is detector-free by design. It identifies salient moments without
+      localizing precise start/end times — i.e., it solves highlight detection but
+      not full moment retrieval. Combining HL-CLIP scores with a lightweight
+      span head is a natural extension.
+    </p>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@inproceedings&#123;han2024hlclip,
+  title     = &#123;Unleash the Potential of CLIP for Video Highlight Detection&#125;,
+  author    = &#123;Han, Donghoon and Seo, Seunghyeon and Park, Eunhwan and Nam, SeongUk and Kwak, Nojun&#125;,
+  booktitle = &#123;CVPR Workshop on Efficient Large Vision Models (ELVM)&#125;,
+  year      = &#123;2024&#125;
+&#125;</pre>
+  </section>
+</PaperLayout>

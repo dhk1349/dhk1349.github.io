@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PaperCard from '../components/PaperCard.astro';
+import { papers } from '../data/papers';
+import { news } from '../data/news';
+import { experience } from '../data/experience';
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Deep Learning Engineer · Dnotitia</p>
+      <h1 class="display">Donghoon Han</h1>
+      <p class="lede">
+        I work on multimodal models and LLM inference at
+        <a href="https://www.dnotitia.com/">Dnotitia</a>, currently focused on
+        KV cache compression and multilingual multimodal retrieval.
+      </p>
+      <p class="lede dim">
+        I received my M.S. in AI at
+        <a href="https://eng.snu.ac.kr/">Seoul National University</a> with
+        Prof. <a href="http://mipal.snu.ac.kr/index.php/Nojun_Kwak">Nojun Kwak</a>
+        at the <a href="https://mipal.snu.ac.kr/mipal">MIPAL</a>
+        lab, and my B.S. in Computer Science & International Studies at
+        <a href="https://www.khu.ac.kr/">KyungHee University</a>.
+      </p>
+      <p class="lede dim">
+        Research interests: LLM inference efficiency, multimodal foundation
+        models, multilingual/multimodal alignment, video understanding.
+      </p>
+      <div class="row links-row">
+        <a class="btn btn-primary" href="mailto:dhk1349@dnotitia.com">Email</a>
+        <a class="btn btn-ghost" href="https://scholar.google.com/citations?user=BKlC7TQAAAAJ&hl=ko&authuser=2">Google Scholar</a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/dhk1349/">LinkedIn</a>
+        <a class="btn btn-ghost" href="https://github.com/dhk1349/">GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Updates</p>
+      <h2>News</h2>
+      <ul class="news">
+        {news.map((n) => (
+          <li>
+            <span class="news-date mono">{n.date}</span>
+            <span class="news-body" set:html={n.body} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Publications</p>
+      <h2>Research</h2>
+      <div class="papers">
+        {papers.map((p) => <PaperCard paper={p} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Background</p>
+      <h2>Experience</h2>
+      <ul class="exp">
+        {experience.map((e) => (
+          <li>
+            <div class="exp-period mono">{e.period}</div>
+            <div class="exp-body">
+              <div class="exp-headline">
+                {e.href ? (
+                  <a href={e.href}><strong>{e.org}</strong></a>
+                ) : (
+                  <strong>{e.org}</strong>
+                )}
+                <span class="dim"> — {e.role}</span>
+              </div>
+              {e.detail && <p class="exp-detail">{e.detail}</p>}
+              {e.bullets && (
+                <ul class="exp-bullets">
+                  {e.bullets.map((b) => <li>{b}</li>)}
+                </ul>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .container { max-width: var(--content-max); }
+
+  .hero { padding: 72px 0 48px; }
+  .lede {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--gray-700);
+    max-width: 640px;
+    margin: 12px 0 0;
+  }
+  .links-row { margin-top: 28px; }
+
+  .news, .exp {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0;
+  }
+  .news li, .exp li {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 20px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-top: 1px solid var(--gray-100);
+  }
+  .news li:first-child, .exp li:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .news-date, .exp-period {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .news-body { font-size: 14px; color: var(--gray-700); line-height: 1.6; }
+
+  .exp-headline { font-size: 15px; line-height: 1.45; }
+  .exp-headline strong { font-weight: 600; }
+  .exp-headline a { color: var(--gray-900); }
+  .exp-detail {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.6;
+  }
+  .exp-bullets {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    color: var(--gray-600);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .exp-bullets li {
+    display: list-item;
+    grid-template-columns: none;
+    gap: 0;
+    padding: 2px 0;
+    border: 0;
+  }
+
+  @media (max-width: 640px) {
+    .hero { padding: 48px 0 32px; }
+    .news li, .exp li {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>

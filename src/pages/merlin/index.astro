@@ -1,0 +1,160 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Donghoon Han', href: 'https://dhk1349.github.io/', equal: true, me: true },
+  { name: 'Eunhwan Park', href: 'https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao', equal: true },
+  { name: 'Gisang Lee', equal: true },
+  { name: 'Adam Lee' },
+  { name: 'Nojun Kwak', href: 'http://mipal.snu.ac.kr/index.php/Nojun_Kwak' },
+];
+
+const links = [
+  { label: 'arXiv', href: 'https://arxiv.org/abs/2407.12508', meta: '2407.12508' },
+  { label: 'Code', href: 'https://github.com/dhk1349/MERLIN_text_to_video_search' },
+];
+---
+
+<PaperLayout
+  title="MERLIN"
+  subtitle="Multimodal Embedding Refinement via LLM-based Iterative Navigation for Text-Video Retrieval-Rerank"
+  venue="EMNLP 2024 · Industry Track"
+  authors={authors}
+  links={links}
+  description="MERLIN refines text-video query embeddings through training-free LLM-based iterative feedback, aligning short user queries with the actual videos they have in mind."
+>
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      Users typically issue short, under-specified queries; videos contain rich
+      multimodal context. This mismatch between query and content is a primary
+      driver of retrieval errors, and one that prior work — focused on cross-modal
+      interaction, foundation-model scaling, or probabilistic modeling — largely
+      ignores. We introduce <strong>MERLIN</strong> (Multimodal Embedding Refinement
+      via LLM-based Iterative Navigation): a training-free pipeline that uses an
+      LLM and a multimodal LLM to simulate clarifying interactions, gradually
+      refining the query embedding toward the user's intent. On MSR-VTT, MSVD, and
+      ActivityNet, MERLIN delivers substantial gains in Recall@1 over strong
+      retrieval baselines.
+    </p>
+  </section>
+
+  <section>
+    <h2>The query–video gap</h2>
+    <figure>
+      <img src="/merlin/img/fig1.png" alt="Illustration of the discrepancy between short user queries and rich video content" loading="lazy" />
+      <figcaption>A short user query rarely captures the full context of the target video. MERLIN closes this gap iteratively, without retraining the underlying retrieval model.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Pipeline</h2>
+    <figure>
+      <img src="/merlin/img/fig2.png" alt="MERLIN architecture: question generation, video QA, aggregation, embedding refinement" loading="lazy" />
+      <figcaption>MERLIN runs over an off-the-shelf retriever. At each round, an LLM asks a clarifying question grounded in the top-1 video; a multimodal LLM answers from sampled frames; the answer embedding is fused into the query via SLERP.</figcaption>
+    </figure>
+
+    <ol>
+      <li>
+        <strong>Question generation.</strong> An LLM uses the top-ranked video's
+        metadata to generate a clarifying question — eliciting context the user
+        didn't initially provide.
+      </li>
+      <li>
+        <strong>Human-simulating agent.</strong> A multimodal LLM answers the
+        question by analyzing frames sampled at 1-second intervals; an aggregation
+        step fuses frame-level answers into a video-level response.
+      </li>
+      <li>
+        <strong>Iterative embedding refinement.</strong> The current answer
+        embedding is combined with the running query embedding via SLERP
+        (spherical linear interpolation) with α=0.8 — biasing toward earlier
+        embeddings to prevent query drift.
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Main results</h2>
+    <p>Recall@1 / Recall@5 / Recall@10 from round 0 (baseline retriever) to round 5 (after five MERLIN iterations).</p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Dataset</th>
+            <th>R@1 (R0 → R5)</th>
+            <th>R@5 (R0 → R5)</th>
+            <th>R@10 (R0 → R5)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="method">MSR-VTT</td>
+            <td>44.40 → <strong>78.00</strong></td>
+            <td>67.60 → 94.20</td>
+            <td>76.20 → 96.80</td>
+          </tr>
+          <tr>
+            <td class="method">MSVD</td>
+            <td>52.39 → <strong>77.61</strong></td>
+            <td>77.16 → 94.48</td>
+            <td>84.78 → 97.31</td>
+          </tr>
+          <tr>
+            <td class="method">ActivityNet</td>
+            <td>56.58 → <strong>68.44</strong></td>
+            <td>84.77 → 91.95</td>
+            <td>91.73 → 96.63</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">+76% relative R@1 on MSR-VTT, +48% on MSVD, +21% on ActivityNet — without training a new model.</p>
+  </section>
+
+  <section>
+    <h2>Why iteration helps — and how it can hurt</h2>
+    <figure>
+      <img src="/merlin/img/fig4.png" alt="Average rank improvement across QA rounds" loading="lazy" />
+      <figcaption>Average rank of the target video improves monotonically across rounds for α = 0.8.</figcaption>
+    </figure>
+
+    <p>
+      The fusion coefficient <em>α</em> controls how much weight the running
+      embedding keeps versus the new round's answer. At <strong>α = 0.8</strong>,
+      gains accumulate stably across rounds. At <strong>α = 0.2</strong>, the
+      query is dragged by each new answer — initial rounds help, then performance
+      <em>declines</em> as the embedding drifts away from the user's original
+      intent.
+    </p>
+  </section>
+
+  <section>
+    <h2>Case studies</h2>
+
+    <h3>ActivityNet</h3>
+    <figure>
+      <img src="/merlin/img/fig5.png" alt="ActivityNet retrieval case study" loading="lazy" />
+    </figure>
+
+    <h3>MSVD</h3>
+    <figure>
+      <img src="/merlin/img/fig6.png" alt="MSVD retrieval case study" loading="lazy" />
+    </figure>
+
+    <h3>MSR-VTT</h3>
+    <figure>
+      <img src="/merlin/img/fig7.png" alt="MSR-VTT retrieval case study" loading="lazy" />
+    </figure>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@inproceedings&#123;han2024merlin,
+  title     = &#123;MERLIN: Multimodal Embedding Refinement via LLM-based Iterative Navigation for Text-Video Retrieval-Rerank Pipeline&#125;,
+  author    = &#123;Han, Donghoon and Park, Eunhwan and Lee, Gisang and Lee, Adam and Kwak, Nojun&#125;,
+  booktitle = &#123;EMNLP 2024 (Industry Track)&#125;,
+  year      = &#123;2024&#125;
+&#125;</pre>
+  </section>
+</PaperLayout>

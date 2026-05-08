@@ -1,0 +1,207 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Donghoon Han', href: 'https://dhk1349.github.io/', affiliation: 'Dnotitia', me: true },
+  { name: 'Eunhwan Park', href: 'https://scholar.google.com/citations?user=FZS2KD8AAAAJ&hl=ko&oi=ao', affiliation: 'Moreh' },
+  { name: 'Seunghyeon Seo', href: 'https://scholar.google.com/citations?user=LL9u-5IAAAAJ&hl=en&oi=ao', affiliation: 'Seoul National University' },
+];
+
+const links = [
+  { label: 'arXiv', href: 'https://arxiv.org/abs/2603.05781', meta: '2603.05781' },
+  { label: 'Code', href: 'https://github.com/dhk1349', meta: 'coming soon' },
+];
+---
+
+<PaperLayout
+  title="Visual Words Meet BM25"
+  subtitle="Sparse Auto-encoder Visual Word Scoring for Image Retrieval"
+  venue="Preprint · 2026"
+  authors={authors}
+  links={links}
+  description="BM25-V: applying Okapi BM25 scoring to sparse visual word activations from a Sparse Autoencoder on Vision Transformer patch tokens for efficient, interpretable image retrieval."
+>
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      Dense image retrieval is accurate but opaque and compute-intensive at scale. We
+      present <strong>BM25-V</strong>, which applies Okapi BM25 scoring to sparse visual
+      word activations from a Sparse Autoencoder (SAE) on Vision Transformer patch
+      tokens. Visual word frequencies follow a Zipfian distribution across the gallery,
+      making BM25's IDF weighting the principled scoring choice for suppressing
+      pervasive, uninformative visual words and amplifying rare, discriminative ones.
+      BM25-V retrieves high-recall candidates via sparse inverted-index operations at a
+      fraction of the cost of dense search: Recall@200 ≥ 0.993 across all benchmarks,
+      enabling a two-stage pipeline that reranks only <em>K</em>=200 candidates instead
+      of all <em>N</em>, recovering near-exact accuracy (−0.2 pp average across seven
+      benchmarks). An SAE trained once on ImageNet-1K transfers zero-shot to seven
+      fine-grained benchmarks without fine-tuning, and every retrieval decision is
+      attributable to specific visual words with quantified IDF contributions.
+    </p>
+  </section>
+
+  <section>
+    <h2>Key results</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">−0.2 pp</div>
+        <div class="stat-label">Two-stage vs. dense R@1</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">48×</div>
+        <div class="stat-label">Index compression</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">50,000×</div>
+        <div class="stat-label">Faster build vs. HNSW</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">Zero-shot</div>
+        <div class="stat-label">SAE → 7 datasets</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Method overview</h2>
+    <p>BM25-V bridges text retrieval and visual search through three ideas:</p>
+    <ol>
+      <li>
+        <strong>Sparse visual words.</strong> A frozen SigLIP2 ViT extracts 729 patch-level
+        features (1152-dim each). A Sparse Autoencoder projects each patch into 18,432
+        dims and applies ReLU + top-<em>k</em> sparsification, keeping only
+        <em>k</em>=16 active visual words per patch.
+      </li>
+      <li>
+        <strong>Term frequency via sum-pooling.</strong> Sparse patch vectors are
+        sum-pooled across all patches into one image-level vector; activation magnitude
+        serves as TF — visual words that fire across many patches get higher TF.
+      </li>
+      <li>
+        <strong>BM25 scoring with IDF.</strong> IDF is computed from the gallery,
+        down-weighting pervasive background features and amplifying rare discriminative
+        ones. Scoring follows the standard Okapi BM25 formula via sparse matrix
+        multiplication on inverted posting lists.
+      </li>
+    </ol>
+    <p>
+      The <strong>two-stage pipeline</strong> combines BM25-V (fast sparse first stage,
+      top-200 candidates) with dense cosine reranking, recovering near-exact dense
+      accuracy while providing interpretable attribution.
+    </p>
+  </section>
+
+  <section>
+    <h2>Main results</h2>
+    <p>
+      Cross-domain retrieval: SAE trained on ImageNet-1K, applied zero-shot to all
+      target datasets. The two-stage system matches full dense retrieval within
+      rounding (−0.2 pp average R@1).
+    </p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>CUB-200</th>
+            <th>Cars-196</th>
+            <th>Aircraft</th>
+            <th>Pets</th>
+            <th>Flowers</th>
+            <th>DTD</th>
+            <th>Food-101</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="method">Dense (cosine)†</td>
+            <td>.767</td><td>.922</td><td>.707</td><td>.912</td><td>.989</td><td>.762</td><td>.954</td>
+          </tr>
+          <tr>
+            <td class="method">FAISS-HNSW†</td>
+            <td>.768</td><td>.922</td><td>.708</td><td>.912</td><td>.989</td><td>.762</td><td>.954</td>
+          </tr>
+          <tr>
+            <td class="method">FAISS-IVF+PQ†</td>
+            <td>.734</td><td>.897</td><td>.715</td><td>.915</td><td>.941</td><td>.706</td><td>.941</td>
+          </tr>
+          <tr class="divider">
+            <td class="method">BM25-V (ours)</td>
+            <td>.472</td><td>.715</td><td>.523</td><td>.771</td><td>.954</td><td>.747</td><td>.865</td>
+          </tr>
+          <tr class="highlight">
+            <td class="method">Two-stage K=200 (ours)</td>
+            <td>.755</td><td>.918</td><td>.704</td><td>.911</td><td>.991</td><td>.769</td><td>.950</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">† Dense-only methods (no interpretability). R@1 reported. Two-stage exceeds full dense on Flowers and DTD.</p>
+  </section>
+
+  <section>
+    <h2>Zipfian distribution of visual words</h2>
+    <p>
+      Visual word frequencies follow a power-law (Zipfian) distribution with exponents
+      α ∈ [1.20, 2.32] — steeper than natural language (α ≈ 1). Most visual words are
+      rare and discriminative, while a small head of common words acts as visual stop
+      words. BM25's IDF weighting is the principled response: it suppresses the common
+      head and amplifies the discriminative tail.
+    </p>
+    <figure>
+      <img src="/bm25v/img/rank_freq_overlay.png" alt="Zipfian rank-frequency distribution across 7 datasets" loading="lazy" />
+      <figcaption>Rank-frequency plot across 7 datasets. Near-parallel lines confirm all datasets share the same distributional form.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Interpretable retrieval attribution</h2>
+    <p>
+      BM25-V is interpretable by construction: the score for any (query, retrieved)
+      pair decomposes as a sum of IDF-weighted terms, one per shared visual word.
+      Unlike dense retrieval where the match is an opaque inner product, BM25-V
+      attribution is exact and requires no approximation.
+    </p>
+
+    <h3>Cars-196</h3>
+    <figure>
+      <img src="/bm25v/img/cars196_xai.png" alt="Cars-196 attribution example" loading="lazy" />
+      <figcaption>The highest-IDF shared word (IDF=6.99) activates on the distinctive racing stripe — a model-specific marking rare across the reference set.</figcaption>
+    </figure>
+
+    <h3>CUB-200-2011</h3>
+    <figure>
+      <img src="/bm25v/img/cub200_xai.png" alt="CUB-200 attribution example" loading="lazy" />
+      <figcaption>Matched Baltimore Oriole pairs share a dimension (IDF=5.90) that fires on the orange breast plumage — the primary field mark used by ornithologists.</figcaption>
+    </figure>
+
+    <h3>Describable Textures (DTD)</h3>
+    <figure>
+      <img src="/bm25v/img/dtd_xai.png" alt="DTD attribution example" loading="lazy" />
+      <figcaption>A dimension (IDF=5.40) detects grid-intersection points across different materials, capturing geometry across diverse textures.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Visual word semantics</h2>
+    <p>
+      Each SAE dimension encodes a specific visual concept. For high-IDF dimensions,
+      collecting the strongest-activating crops from the reference set reveals visually
+      coherent patterns — confirming monosemantic encoding.
+    </p>
+    <figure>
+      <img src="/bm25v/img/cars196_word_semantics.png" alt="Visual word semantics grid on Cars-196" loading="lazy" />
+      <figcaption>Each row is one SAE dimension; each cell is a reference-set crop sorted by activation strength. Coherent rows indicate monosemantic dimensions.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@article&#123;han2026bm25v,
+  title   = &#123;Visual Words Meet BM25: Sparse Auto-encoder Visual Word Scoring for Image Retrieval&#125;,
+  author  = &#123;Han, Donghoon and Park, Eunhwan and Seo, Seunghyeon&#125;,
+  year    = &#123;2026&#125;,
+  note    = &#123;Preprint&#125;
+&#125;</pre>
+  </section>
+</PaperLayout>
