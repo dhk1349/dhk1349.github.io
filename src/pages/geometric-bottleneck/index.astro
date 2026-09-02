@@ -1,0 +1,400 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Donghoon Han', href: 'https://dhk1349.github.io/', affiliation: 'Dnotitia', me: true },
+  { name: 'SungHyun Moon', affiliation: 'Dnotitia' },
+  { name: 'Aidyn Zhakatayev', affiliation: 'Dnotitia' },
+  { name: 'Junghun Cha', affiliation: 'Dnotitia' },
+  { name: 'SeungJae Lee', affiliation: 'Dnotitia' },
+];
+
+const links = [
+  { label: 'arXiv', href: 'https://arxiv.org/abs/2608.30725', meta: '2608.30725' },
+  { label: 'Code', href: 'https://github.com/dnotitia/geometric-bottleneck', meta: 'coming soon' },
+];
+---
+
+<PaperLayout
+  title="Where Do Multilingual Vision-Language Encoders Fail on Low-Resource Languages?"
+  venue="EMNLP 2026 · Main Conference"
+  authors={authors}
+  links={links}
+  description="We falsify the linear-bias account and localise the low-resource retrieval gap to the EOS hidden state's forward-path trajectory. Swapping that single row three blocks before the projector lifts Swahili retrieval from 22.1% to 69.1%."
+>
+  <section>
+    <figure>
+      <img
+        src="/geometric-bottleneck/img/teaser.png"
+        alt="Two-lane schematic: EOS activation patching at layer N-4 and front-layer trunk calibration"
+      />
+      <figcaption>
+        Two interventions on the same object. Replacing the target caption's EOS hidden
+        state with its parallel English value three blocks before the projector
+        (ℓ = <em>N</em>−4) lifts Swahili image-to-text R@1 from 22.1% to 69.1% on
+        MetaCLIP-2 — essentially the English single-source reference (69.4%). A
+        front-layer trunk re-fits only the first <em>M</em> blocks and reproduces the
+        effect at training time, with no parallel caption at inference.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      Recent multilingual vision–language encoders cover hundreds of languages in a
+      single model, yet on two state-of-the-art instances retrieval on low-resource
+      languages (LRL; e.g. Swahili) trails high-resource ones (HRL; e.g. English) by
+      30<sup>+</sup> pp. We ask <strong>where in the trained encoder this gap is
+      located</strong>. Prior modality-gap and cross-lingual subspace work suggests a
+      linear language direction at the output crowds out alignment-relevant geometry.
+      We falsify this: LEACE drives the linear language classifier from &gt;99% to near
+      chance and iterated INLP to 37–50% while LRL retrieval moves within ±1.5 pp and
+      all tier means within 2.2 pp, tracking random controls. The linear bias is a
+      <em>symptom</em>, not the cause. Instead, the alignment-causal factor lies along
+      the encoder's forward path: the EOS (end-of-sequence) hidden state's per-language
+      trajectory diverges with depth. Substituting the EOS with its parallel English
+      value three blocks before the projector lifts Swahili from 22.1% to 69.1% on one
+      encoder (and reproduces on the other); three controls rule out pooled-position
+      tautology and English specificity. A front-layer trunk that pulls each language's
+      projection toward the parallel-content centroid corroborates the diagnosis at
+      training time, recovering +9.6 / +17.1 pp on LRL XM3600 retrieval (1,000-image
+      subset), with consistent gains across three further benchmarks while preserving
+      HRL performance.
+    </p>
+  </section>
+
+  <section>
+    <h2>Key numbers</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">±1.5 pp</div>
+        <div class="stat-label">LRL change after erasure</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">22.1 → 69.1</div>
+        <div class="stat-label">Swahili R@1, one row swap</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">+9.6 / +17.1</div>
+        <div class="stat-label">LRL pp from trunk</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">5 encoders</div>
+        <div class="stat-label">Diagnosis replicates</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The question</h2>
+    <p>
+      MetaCLIP-2 and SigLIP-2 cover hundreds of languages in one dual encoder, but
+      image–text retrieval still shows a 30<sup>+</sup> pp Recall@1 gap between
+      high-resource languages (HRL-6: en, fr, de, es, zh, ko) and low-resource ones
+      (LRL-5: bn, fil, hi, sw, te), reproduced on XM3600, Flickr30k-200, XTD-200 and
+      Babel-ImageNet. Benchmark-level analyses report that the gap exists; they do not
+      say <em>where along the encoder's forward path</em> the representations diverge.
+      We localise it by intervention.
+    </p>
+  </section>
+
+  <section>
+    <h2>1. The linear language direction is a symptom, not the cause</h2>
+    <p>
+      Language identity is trivially linearly extractable from the output text
+      embedding: a 13-way logistic-regression probe reaches <strong>99.8%</strong> on
+      MetaCLIP-2 and <strong>99.7%</strong> on SigLIP-2 (chance 7.7%). Averaging the six
+      HRL embeddings of a parallel caption also lifts retrieval by
+      <strong>+17.4 pp</strong>. The natural hypothesis is that this direction crowds out
+      alignment-relevant geometry.
+    </p>
+    <p>
+      It does not. LEACE erases the direction to chance and retrieval barely moves — and
+      moves exactly as much as a same-rank <em>random</em> orthogonal ablation. Iterated
+      INLP up to rank 128 attenuates the classifier to 37–50% with the same null result.
+    </p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>XM3600 i2t R@1 (%)</th>
+            <th>MC2 HRL</th>
+            <th>MC2 LRL</th>
+            <th>SL2 HRL</th>
+            <th>SL2 LRL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="method">Base embedding</td>
+            <td>78.1</td><td>44.1</td><td>63.3</td><td>21.7</td>
+          </tr>
+          <tr>
+            <td class="method">LEACE (classifier → chance)</td>
+            <td>77.5</td><td>43.0</td><td>64.0</td><td>21.6</td>
+          </tr>
+          <tr>
+            <td class="method">Random rank-12 ablation</td>
+            <td>78.2</td><td>43.6</td><td>63.0</td><td>21.8</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      LEACE drops the language classifier from ~99.8% to 3–5%, yet no cell moves more
+      than 1.5 pp and LEACE is indistinguishable from a random projection of the same
+      rank. A linearly visible feature is not, by itself, evidence of a causal one.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. The causal factor is the EOS forward-path trajectory</h2>
+    <p>
+      We probe the forward path with single-row activation patching. At layer ℓ, the
+      target caption's EOS hidden state is overwritten with its parallel English value,
+      every other token row is kept, and the frozen back-half runs unchanged. Retrieval
+      is then scored against the fixed image gallery.
+    </p>
+    <figure>
+      <img
+        src="/geometric-bottleneck/img/patch_sweep.png"
+        alt="EOS patch layer sweep on MetaCLIP-2, HRL and LRL tier means against the English reference"
+        loading="lazy"
+      />
+      <figcaption>
+        Tier-averaged XM3600 i2t R@1 across EOS-patch layers on frozen MetaCLIP-2 (1,000
+        images). The rescue grows toward the near-final region rather than peaking at a
+        confined layer.
+      </figcaption>
+    </figure>
+    <p>
+      We headline ℓ = <em>N</em>−4, which still passes through three unmodified back-half
+      blocks. LRL retrieval rises from 44.1% to <strong>73.4%</strong> (+29.3 pp) on
+      MetaCLIP-2 and from 21.7% to <strong>66.6%</strong> on SigLIP-2 — on a
+      causal-attention and a bidirectional-attention encoder alike. Three controls
+      separate this from a pooled-position tautology:
+    </p>
+    <ul>
+      <li>
+        <strong>Mid-token patch.</strong> Patching a non-EOS row at ℓ = <em>N</em>−1
+        leaves LRL retrieval essentially unchanged — the effect is specific to the
+        pooled row.
+      </li>
+      <li>
+        <strong>Random-English EOS.</strong> An English EOS from an <em>unrelated</em>
+        caption collapses retrieval below baseline (44.1 → 7.7 on MetaCLIP-2). The
+        rescue needs parallel <em>content</em>, not an English-distributed vector.
+      </li>
+      <li>
+        <strong>Norm-matched Gaussian.</strong> Destroys retrieval entirely (HRL ~80 →
+        8.5%, LRL → 1.6%), so the effect is signal-specific rather than norm-driven.
+      </li>
+    </ul>
+    <p>
+      The rescue is also <strong>not English-specific</strong>: a parallel French EOS
+      lifts Swahili to 78.7%, and the mean of the six HRL EOS states lifts it to
+      <strong>88.0%</strong> — above the English single-source reference. That is what a
+      trajectory account predicts: a multi-HRL centroid sits closer to the interior of
+      the parallel-content cone than any single EOS.
+    </p>
+  </section>
+
+  <section>
+    <h2>3. Trunk calibration: the same diagnosis, at training time</h2>
+    <p>
+      Patching needs an oracle parallel caption at inference. As a general-input test of
+      the same diagnosis, we soft fine-tune only the <strong>first <em>M</em>
+      text-encoder blocks</strong> (<em>M</em>=4 for MetaCLIP-2, <em>M</em>=3 for
+      SigLIP-2) so each language's projected output moves toward the parallel-content
+      anchor, while the back-half, projection head and vision tower stay frozen.
+      Training uses text-only parallel-translation groups over a 1M-caption CC12M
+      subset; ~50M / ~40M parameters are trainable.
+    </p>
+    <figure>
+      <img
+        src="/geometric-bottleneck/img/tier_summary.png"
+        alt="Tier-mean retrieval on XM3600: frozen, trunk-calibrated, and EOS-patched"
+        loading="lazy"
+      />
+      <figcaption>
+        XM3600 (1,000-image subset) tier means. The trunk recovers a substantial fraction
+        of the LRL gap from general input; the oracle patch, which is handed parallel
+        content at inference, goes further.
+      </figcaption>
+    </figure>
+
+    <h3>Per-language XM3600 retrieval</h3>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Lang</th>
+            <th>Tier</th>
+            <th>MC2 frozen</th>
+            <th>MC2 cal.</th>
+            <th>SL2 frozen</th>
+            <th>SL2 cal.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">en</td><td>HRL</td><td>69.4</td><td>72.0</td><td>66.1</td><td>70.5</td></tr>
+          <tr><td class="method">fr</td><td>HRL</td><td>84.4</td><td>86.2</td><td>78.2</td><td>82.6</td></tr>
+          <tr><td class="method">de</td><td>HRL</td><td>86.5</td><td>86.8</td><td>33.7</td><td><strong>43.8</strong></td></tr>
+          <tr><td class="method">es</td><td>HRL</td><td>78.0</td><td>77.6</td><td>64.1</td><td>67.4</td></tr>
+          <tr><td class="method">zh</td><td>HRL</td><td>74.6</td><td>77.5</td><td>63.8</td><td><strong>70.5</strong></td></tr>
+          <tr><td class="method">ko</td><td>HRL</td><td>75.5</td><td>78.9</td><td>74.0</td><td>77.0</td></tr>
+          <tr class="divider"><td class="method">bn</td><td>LRL</td><td>64.7</td><td>69.0</td><td>30.2</td><td><strong>42.7</strong></td></tr>
+          <tr><td class="method">fil</td><td>LRL</td><td>39.9</td><td><strong>52.7</strong></td><td>26.9</td><td><strong>45.0</strong></td></tr>
+          <tr><td class="method">hi</td><td>LRL</td><td>49.4</td><td>52.9</td><td>33.6</td><td>38.5</td></tr>
+          <tr><td class="method">sw</td><td>LRL</td><td>22.1</td><td><strong>42.1</strong></td><td>12.4</td><td><strong>35.7</strong></td></tr>
+          <tr><td class="method">te</td><td>LRL</td><td>44.3</td><td><strong>52.0</strong></td><td>5.2</td><td><strong>31.9</strong></td></tr>
+          <tr class="highlight divider"><td class="method">HRL mean</td><td></td><td>78.1</td><td>79.8</td><td>63.3</td><td>68.6</td></tr>
+          <tr class="highlight"><td class="method">LRL mean</td><td></td><td>44.1</td><td>53.7</td><td>21.7</td><td>38.8</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Image-to-text R@1 (%) on the 1,000-image XM3600 subset, frozen vs. trunk-calibrated.
+      Bold marks a lift ≥ +5 pp. HRL performance is preserved or slightly improved
+      throughout; SigLIP-2's weak German baseline also rises +10.1 pp.
+    </p>
+
+    <h3>Cross-benchmark replication</h3>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Benchmark</th>
+            <th>MC2 ΔHRL</th>
+            <th>MC2 ΔLRL</th>
+            <th>SL2 ΔHRL</th>
+            <th>SL2 ΔLRL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">Flickr30k-200</td><td>+0.7</td><td>+8.4</td><td>+3.3</td><td>+20.4</td></tr>
+          <tr><td class="method">XTD-200</td><td>+2.2</td><td>+9.0</td><td>+3.2</td><td>+19.1</td></tr>
+          <tr><td class="method">XM3600 (full)</td><td>+1.4</td><td>+7.5</td><td>+4.3</td><td>+10.7</td></tr>
+          <tr><td class="method">Babel-ImageNet</td><td>+2.3</td><td>+6.3</td><td>+1.3</td><td>+9.5</td></tr>
+          <tr class="highlight"><td class="method">mean (4 benchmarks)</td><td>+1.7</td><td>+7.8</td><td>+3.0</td><td>+14.9</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Trunk-calibration Δ in tier-mean performance (pp). Metric is i2t R@1 for the
+      retrieval benchmarks and top-1 accuracy for Babel-ImageNet. Every cell is
+      positive, so the gain is not XM3600 overfitting.
+    </p>
+  </section>
+
+  <section>
+    <h2>4. What calibration does to the geometry</h2>
+    <p>
+      Per-layer cross-lingual CKA on 1,000 image-aligned XM3600 captions shows the
+      predicted reshaping. In the frozen encoder, the HRL–LRL curve sits about
+      0.10–0.12 below the within-HRL curve near the projector input — the geometric
+      counterpart of the retrieval tier gap. After calibration, HRL–LRL CKA rises from
+      0.458 to 0.556 at ℓ=23 on MetaCLIP-2 and from 0.302 to 0.451 at ℓ=26 on SigLIP-2.
+    </p>
+    <figure>
+      <img
+        src="/geometric-bottleneck/img/cka_layers.png"
+        alt="Per-layer cross-lingual CKA on MetaCLIP-2 and SigLIP-2, frozen versus trunk-calibrated"
+        loading="lazy"
+      />
+      <figcaption>
+        Solid: frozen. Dashed: trunk-calibrated. The shaded band marks the trunk-trained
+        front blocks (ℓ &lt; <em>M</em>). Only the front blocks are trained, yet the lift
+        appears at the final block — the frozen back-half stays competent on the shifted
+        region.
+      </figcaption>
+    </figure>
+    <p>
+      The trajectory divergence itself falls at every depth, with the tier gap shrinking
+      from 0.119 to 0.022 on MetaCLIP-2 and from 0.143 to 0.045 on SigLIP-2. Across the
+      ten non-English trained languages, that same frozen divergence correlates
+      negatively with a WebLI-100B pretraining prevalence proxy (Spearman −0.88 /
+      −0.64) — corroborating context, not a second claim, at <em>n</em>=10.
+    </p>
+  </section>
+
+  <section>
+    <h2>5. It is not specific to the MetaCLIP-2 / SigLIP-2 pair</h2>
+    <p>
+      We replicate the frozen gap, pooler-row patching, and the same trunk recipe on
+      three architecturally distinct encoders that differ in pooling regime, text-tower
+      scale, and pretraining objective: <strong>AltCLIP</strong> (XLM-R-Large,
+      CLS-pooled, 24L), <strong>NLLB-CLIP-L</strong> (NLLB-200 encoder,
+      language-code-pooled, 24L), and <strong>mSigLIP</strong> (SigLIP-base, sticky-EOS,
+      12L).
+    </p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Frozen HRL</th>
+            <th>Frozen LRL</th>
+            <th>Gap (pp)</th>
+            <th>Trunk ΔLRL XM3600</th>
+            <th>Trunk ΔLRL Flickr30k-200</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">MetaCLIP-2 (main)</td><td>78.1</td><td>44.1</td><td>34.0</td><td>+9.6</td><td>+8.4</td></tr>
+          <tr><td class="method">SigLIP-2 (main)</td><td>63.3</td><td>21.7</td><td>41.6</td><td>+17.1</td><td>+20.4</td></tr>
+          <tr class="divider"><td class="method">AltCLIP</td><td>49.2</td><td>6.6</td><td>42.6</td><td><strong>+37.2</strong></td><td><strong>+51.3</strong></td></tr>
+          <tr><td class="method">NLLB-CLIP-L</td><td>55.4</td><td>38.5</td><td>16.8</td><td>+10.3</td><td>+9.4</td></tr>
+          <tr><td class="method">mSigLIP</td><td>73.5</td><td>32.4</td><td>41.1</td><td>+17.6</td><td>+26.7</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      The HRL &gt; LRL gap holds across every pooling regime and text-tower family
+      tested. AltCLIP's large lifts follow from its very weak frozen LRL baseline;
+      NLLB-CLIP-L's smaller lifts follow from its MT-pretrained high baseline — yet a
+      16.8 pp gap persists even there.
+    </p>
+  </section>
+
+  <section>
+    <h2>Takeaway</h2>
+    <p>
+      Linearly extractable language identity at the output and the alignment-causal
+      mechanism are different phenomena. Concept erasure removes the identity direction
+      with little change to retrieval; the causal factor is the per-language
+      forward-path trajectory of the pooled hidden state. For multilingual dual-encoder
+      design, this argues for intervening on the <em>trajectory</em> rather than the
+      output embedding — per-language drift is already expressed at the depth-<em>M</em>
+      EOS hidden state, which makes the front blocks a natural correction site while the
+      back-half stays frozen.
+    </p>
+    <p>
+      These measurements also form a retraining-free diagnostic checklist for new
+      multilingual vision-language encoder releases: per-layer cross-lingual CKA, LEACE
+      on the output embedding, EOS-patch sweeps at ℓ ∈ &#123;<em>N</em>−4, <em>N</em>−1&#125; with
+      parallel-EN / random-EN / mid-token controls, and per-language back-half
+      sensitivity.
+    </p>
+    <p>
+      <strong>Scope.</strong> What we establish is an interventional <em>localisation</em>
+      within trained encoders, not a complete causal account of why the divergence
+      arises during pretraining. Tokenisation, attention regime, optimisation dynamics
+      and data prevalence all remain live upstream candidates. Trunk calibration also
+      narrows but does not close the tier gap, and it requires parallel-text supervision
+      that passes an MT-quality screen.
+    </p>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@inproceedings&#123;han2026where,
+  title     = &#123;Where Do Multilingual Vision-Language Encoders Fail on Low-Resource Languages?&#125;,
+  author    = &#123;Han, Donghoon and Moon, SungHyun and Zhakatayev, Aidyn and Cha, Junghun and Lee, SeungJae&#125;,
+  booktitle = &#123;Proceedings of the 2026 Conference on Empirical Methods in Natural Language Processing (EMNLP)&#125;,
+  year      = &#123;2026&#125;,
+  note      = &#123;To appear. Preprint: arXiv:2608.30725&#125;
+&#125;</pre>
+  </section>
+</PaperLayout>

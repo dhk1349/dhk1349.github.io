@@ -5,6 +5,14 @@ export type NewsItem = {
 
 export const news: NewsItem[] = [
   {
+    date: 'Sep 2026',
+    body: 'One paper accepted to <a href="https://2026.emnlp.org/">EMNLP 2026</a> (Main Conference) — see the <a href="/geometric-bottleneck">project page</a>.',
+  },
+  {
+    date: 'Aug 2026',
+    body: 'New preprint on <a href="/geometric-bottleneck">where multilingual vision-language encoders fail</a> on low-resource languages.',
+  },
+  {
     date: 'Mar 2026',
     body: 'New preprint on <a href="/bm25v">BM25-V</a>: sparse visual word scoring for interpretable image retrieval.',
   },

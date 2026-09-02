@@ -31,6 +31,28 @@ const EUNHWAN = {
 
 export const papers: Paper[] = [
   {
+    id: 'geometric-bottleneck',
+    title: 'Where Do Multilingual Vision-Language Encoders Fail on Low-Resource Languages?',
+    authors: [
+      ME,
+      { name: 'SungHyun Moon' },
+      { name: 'Aidyn Zhakatayev' },
+      { name: 'Junghun Cha' },
+      { name: 'SeungJae Lee' },
+    ],
+    venue: 'EMNLP 2026 (Main Conference)',
+    venueShort: 'EMNLP',
+    year: 2026,
+    links: [
+      { label: 'project', href: '/geometric-bottleneck' },
+      { label: 'arXiv', href: 'https://arxiv.org/abs/2608.30725' },
+    ],
+    abstract:
+      "Erasing the linearly extractable language direction leaves low-resource retrieval unchanged, so it is a symptom rather than the cause. The alignment-causal factor is the EOS hidden state's per-language forward-path trajectory: swapping that single row for its parallel English value three blocks before the projector lifts Swahili R@1 from 22.1% to 69.1%, and a front-layer trunk reproduces the effect at training time across four benchmarks and five encoders.",
+    imageBefore: '/images/geombottleneck_before.png',
+    imageAfter: '/images/geombottleneck_after.png',
+  },
+  {
     id: 'bm25v',
     title: 'Visual Words Meet BM25: Sparse Auto-encoder Visual Word Scoring for Image Retrieval',
     authors: [ME, EUNHWAN, SEUNGHYEON],
