@@ -11,7 +11,7 @@ export type AuthorRow = {
 
 export type ResourceLink = {
   label: string;
-  href: string;
+  href?: string;
   meta?: string;
 };
 
@@ -62,12 +62,19 @@ const {
         )}
 
         <div class="resources">
-          {links.map((l) => (
-            <a class="resource" href={l.href}>
-              <span class="resource-label">{l.label}</span>
-              {l.meta && <span class="resource-meta mono">{l.meta}</span>}
-            </a>
-          ))}
+          {links.map((l) =>
+            l.href ? (
+              <a class="resource" href={l.href}>
+                <span class="resource-label">{l.label}</span>
+                {l.meta && <span class="resource-meta mono">{l.meta}</span>}
+              </a>
+            ) : (
+              <span class="resource disabled">
+                <span class="resource-label">{l.label}</span>
+                {l.meta && <span class="resource-meta mono">{l.meta}</span>}
+              </span>
+            )
+          )}
         </div>
       </div>
     </header>
@@ -151,6 +158,9 @@ const {
     box-shadow: var(--ring);
     text-decoration: none;
   }
+  .resource.disabled { cursor: default; }
+  .resource.disabled:hover { background: var(--white); box-shadow: var(--ring-light); }
+  .resource.disabled .resource-label { color: var(--gray-500); }
   .resource-label { color: var(--gray-900); }
   .resource-meta { color: var(--gray-500); font-size: 12px; }
 

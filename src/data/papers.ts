@@ -31,6 +31,19 @@ const EUNHWAN = {
 
 export const papers: Paper[] = [
   {
+    id: 'cose',
+    title: 'You CAN Teach an Old Model New Tricks: Domain Adaptation via Complementary Subspace Expansion',
+    authors: [ME, { name: 'SungHyun Moon' }, { name: 'SeungJae Lee' }],
+    venue: 'NeurIPS 2026',
+    venueShort: 'NeurIPS',
+    year: 2026,
+    links: [{ label: 'project', href: '/cose' }],
+    abstract:
+      'CoSE leaves the deployed embedding structurally untouched and appends a jointly trained LoRA side channel, so legacy indices stay valid while a single α knob trades general retention for domain retrieval.',
+    imageBefore: '/images/cose_before.png',
+    imageAfter: '/images/cose_after.png',
+  },
+  {
     id: 'geometric-bottleneck',
     title: 'Where Do Multilingual Vision-Language Encoders Fail on Low-Resource Languages?',
     authors: [

@@ -1,0 +1,324 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Donghoon Han', href: 'https://dhk1349.github.io/', affiliation: 'Dnotitia', me: true },
+  { name: 'SungHyun Moon', affiliation: 'Dnotitia' },
+  { name: 'SeungJae Lee', affiliation: 'Dnotitia' },
+];
+
+const links = [
+  { label: 'arXiv', meta: 'coming soon' },
+  { label: 'Code', meta: 'coming soon' },
+];
+---
+
+<PaperLayout
+  title="You CAN Teach an Old Model New Tricks"
+  subtitle="Domain Adaptation via Complementary Subspace Expansion"
+  venue="NeurIPS 2026"
+  authors={authors}
+  links={links}
+  description="CoSE adapts a deployed vision-language embedding model to a new domain without touching its legacy index: the frozen embedding is preserved by construction and a jointly trained LoRA side channel is appended alongside it."
+>
+  <section>
+    <figure>
+      <img
+        src="/cose/img/bc_frontier.png"
+        alt="Preservation-constrained backward-compatibility frontier on four domains; CoSE is the best full-preservation point on each"
+      />
+      <figcaption>
+        Preservation-constrained BC frontier under a 5 pp budget. <em>x</em>: domain R@1
+        gain over the frozen model on a migration-compatible index; <em>y</em>: how many of
+        &#123;Flickr, COCO, ImageNet&#125; stay within 5 pp of frozen. Circled: the best
+        exact-BC method at 3/3 preservation — CoSE on all four domains. The red segment
+        connects CoSE at α = 0.5 and at the val-tuned α*, both from one checkpoint.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      Production retrieval requires three properties jointly: domain adaptation,
+      general-retrieval preservation, and backward compatibility with deployed indices.
+      Existing methods achieve at most two: PEFT breaks the index and degrades general
+      retrieval; BCT preserves the index only approximately; L2C preserves general retrieval
+      but still modifies the deployed embedding. We introduce <strong>CoSE</strong>
+      (Complementary Subspace Expansion), a side-branch LoRA whose frozen pathway is
+      structurally untouched: legacy <em>z</em><sub>old</sub> entries are never rewritten,
+      and a jointly-trained <em>z</em><sub>new</sub> channel is appended alongside them. At
+      α = 1 the deployed score recovers the frozen ranking exactly; for α &lt; 1, domain
+      gains require computing <em>z</em><sub>new</sub> per document but the legacy index
+      stays valid throughout migration. A three-term joint loss converts the frozen+LoRA
+      concatenation into Pareto-efficient retrieval. Across four domains (Korean broadcast,
+      medical radiology, art paintings, remote sensing) and 3 seeds, CoSE at 6.4M trainable
+      parameters stays within ±0.048 of frozen on Flickr/COCO/ImageNet at α = 0.5 and is
+      domain-competitive at val-tuned α* — the only configuration we evaluate that
+      simultaneously delivers structural BC, general retention, and competitive domain
+      quality from a single checkpoint.
+    </p>
+  </section>
+
+  <section>
+    <h2>Key numbers</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">α = 1</div>
+        <div class="stat-label">Exact frozen ranking</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">±0.048</div>
+        <div class="stat-label">General drift at α = 0.5</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">6.4M</div>
+        <div class="stat-label">Trainable params (0.30%)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4 / 4</div>
+        <div class="stat-label">Domains on the BC frontier</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The problem: the index is the expensive part</h2>
+    <p>
+      In multimodal retrieval, the index built from a deployed embedding model is often the
+      largest asset in the serving stack — re-embedding a billion-document corpus can take
+      weeks of GPU time. Adapting that model to a new domain therefore carries a second cost
+      beyond fine-tuning: index migration. Current methods force a trade-off.
+    </p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Domain</th>
+            <th>General</th>
+            <th>Backward-compatible</th>
+            <th>Params</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">Frozen</td><td>✗</td><td>✓✓</td><td>✓</td><td>0</td></tr>
+          <tr><td class="method">LoRA</td><td>✓✓</td><td>✗</td><td>✗</td><td>6.4M</td></tr>
+          <tr><td class="method">BCT</td><td>✓</td><td>✗</td><td>≈</td><td>6.4M</td></tr>
+          <tr><td class="method">L2C-matched</td><td>≈</td><td>✓</td><td>✗</td><td>6.4M</td></tr>
+          <tr class="highlight"><td class="method">CoSE</td><td>✓</td><td>✓</td><td>✓</td><td>6.4M</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Qualitative positioning at 6.4M trainable parameters (✓✓ strong, ✓ acceptable,
+      ≈ partial, ✗ fails). CoSE is the only configuration whose score family contains an
+      exact frozen-ranking endpoint while still moving toward domain quality.
+    </p>
+  </section>
+
+  <section>
+    <h2>1. Why expansion is necessary</h2>
+    <p>
+      Two short results bound the design space. First, exact compatibility
+      <em>within</em> the deployed <em>d</em>-dimensional channel is trivial: if an adapted
+      query encoder reproduces every score against a full-rank legacy index, it must equal
+      the frozen encoder. Any non-trivial adaptation that keeps legacy scores exact has to
+      <strong>expand the score channel</strong>.
+    </p>
+    <p>
+      Second, a direct-sum normal form: any expanded representation from which the frozen
+      embedding can be read out by a fixed linear projection is, up to a change of
+      coordinates, <code>[ z<sub>old</sub> ; h(x) ]</code>. CoSE's concatenation is
+      therefore not an ad hoc trick — it is the canonical shape of auditable backward
+      compatibility.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Side-branch LoRA architecture</h2>
+    <figure>
+      <img
+        src="/cose/img/architecture.png"
+        alt="CoSE architecture: a frozen pass produces z_old, a LoRA side branch produces z_new, and they are concatenated"
+        loading="lazy"
+      />
+      <figcaption>
+        Pass 1 (frozen) runs the unmodified base encoder and produces the preserved legacy
+        embedding <em>z</em><sub>old</sub>. Pass 2 is a trainable side branch with LoRA on the
+        attention projections that consumes detached Pass-1 hidden states and produces the
+        complementary <em>z</em><sub>new</sub>. The retrieval embedding is
+        <em>z</em><sub>final</sub> = [<em>z</em><sub>old</sub> ‖ <em>z</em><sub>new</sub>].
+      </figcaption>
+    </figure>
+    <p>
+      Because the first <em>d</em> coordinates are produced by a forward pass identical to
+      the base encoder, every score against a legacy document is exactly the frozen-model
+      score (index preservation by construction). On Qwen3-VL-Embedding-2B
+      (<em>L</em> = 28, <em>d</em> = 2048, rank 16) the side branch has
+      <strong>6.4M</strong> trainable parameters, 0.30% of the base.
+    </p>
+    <p>
+      At inference, a single scalar blends the two channels:
+    </p>
+    <pre class="citation">s_α(q, d) = α · ⟨z_old(q), z_old(d)⟩ + (1 − α) · ⟨z_new(q), z_new(d)⟩</pre>
+    <p>
+      For every α ∈ [0, 1] this is a positive-semidefinite kernel, so α indexes a family of
+      valid retrieval kernels rather than a heuristic interpolation. α = 1 is the frozen
+      model exactly; α = 0.5 is the unweighted concatenation and a zero-tune default; an
+      operator can pick α* with a 1-D sweep on a small validation set — no retraining.
+    </p>
+    <p>
+      Training uses three terms, each anchoring one operating point:
+      InfoNCE on <em>z</em><sub>final</sub> (the α = 0.5 blend), InfoNCE on
+      <em>z</em><sub>new</sub> alone (the α = 0 endpoint), and a Matryoshka loss so
+      <em>z</em><sub>new</sub> can be truncated for cheaper storage. The α = 1 endpoint is
+      anchored for free by the frozen pretraining.
+    </p>
+  </section>
+
+  <section>
+    <h2>3. Results across four domains</h2>
+    <p>
+      We adapt Qwen3-VL-Embedding-2B to Korean broadcast/cultural imagery (HAN extended),
+      medical radiology (ROCO), art paintings (SemArt) and remote sensing (RSICD), and track
+      general retrieval on Flickr30K, COCO and ImageNet zero-shot. All learned methods use
+      6.4M trainable parameters; numbers are 3-seed means on the test split.
+    </p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th>Method</th>
+            <th>BC</th>
+            <th>Domain R@1</th>
+            <th>Migration R@1</th>
+            <th>INet Top-1</th>
+            <th>COCO</th>
+            <th>Flickr</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">HAN extended</td><td>LoRA</td><td>✗</td><td>0.450</td><td>0.390</td><td>0.531</td><td>0.415</td><td>0.776</td></tr>
+          <tr><td></td><td>BCT-canonical</td><td>≈</td><td><strong>0.492</strong></td><td>0.424</td><td>0.550</td><td>0.479</td><td>0.858</td></tr>
+          <tr class="highlight"><td></td><td>CoSE α = 0.5</td><td>✓</td><td>0.433</td><td>0.433</td><td>0.635</td><td>0.683</td><td>0.881</td></tr>
+          <tr class="highlight"><td></td><td>CoSE α* ≈ 0.12</td><td>✓</td><td>0.465</td><td><strong>0.465</strong></td><td>0.531</td><td>0.507</td><td>0.757</td></tr>
+          <tr class="divider"><td class="method">ROCO</td><td>LoRA</td><td>✗</td><td><strong>0.457</strong></td><td>0.247</td><td>0.498</td><td>0.465</td><td>0.767</td></tr>
+          <tr><td></td><td>BCT-canonical</td><td>≈</td><td>0.365</td><td>0.263</td><td>0.602</td><td>0.545</td><td>0.843</td></tr>
+          <tr class="highlight"><td></td><td>CoSE α = 0.5</td><td>✓</td><td>0.353</td><td>0.353</td><td>0.638</td><td>0.684</td><td>0.893</td></tr>
+          <tr class="highlight"><td></td><td>CoSE α* ≈ 0.15</td><td>✓</td><td>0.385</td><td><strong>0.385</strong></td><td>0.577</td><td>0.633</td><td>0.845</td></tr>
+          <tr class="divider"><td class="method">SemArt</td><td>LoRA</td><td>✗</td><td><strong>0.513</strong></td><td>0.341</td><td>0.614</td><td>0.519</td><td>0.846</td></tr>
+          <tr><td></td><td>BCT-canonical</td><td>≈</td><td>0.487</td><td>0.388</td><td>0.604</td><td>0.531</td><td>0.844</td></tr>
+          <tr class="highlight"><td></td><td>CoSE α = 0.5</td><td>✓</td><td>0.470</td><td>0.470</td><td>0.650</td><td>0.685</td><td>0.889</td></tr>
+          <tr class="highlight"><td></td><td>CoSE α* ≈ 0.32</td><td>✓</td><td>0.492</td><td><strong>0.492</strong></td><td>0.630</td><td>0.660</td><td>0.870</td></tr>
+          <tr class="divider"><td class="method">RSICD</td><td>LoRA</td><td>✗</td><td>0.157</td><td>0.108</td><td>0.281</td><td>0.360</td><td>0.617</td></tr>
+          <tr><td></td><td>BCT-cosine</td><td>≈</td><td><strong>0.172</strong></td><td>0.113</td><td>0.521</td><td>0.529</td><td>0.831</td></tr>
+          <tr class="highlight"><td></td><td>CoSE α = 0.5</td><td>✓</td><td>0.158</td><td>0.158</td><td>0.596</td><td>0.675</td><td>0.865</td></tr>
+          <tr class="highlight"><td></td><td>CoSE α* ≈ 0.33</td><td>✓</td><td>0.160</td><td><strong>0.160</strong></td><td>0.541</td><td>0.632</td><td>0.828</td></tr>
+          <tr class="divider"><td class="method">Frozen</td><td>no adaptation</td><td>✓</td><td colspan="2">0.319 / 0.141 / 0.203 / 0.087</td><td>0.644</td><td>0.688</td><td>0.880</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Domain R@1 is avg(i2t, t2i). Migration R@1 queries with the adapted encoder against a
+      legacy frozen index (for CoSE, the expanded index, with α = 1 guaranteeing exact frozen
+      recovery). General columns are ImageNet zero-shot top-1 and COCO/Flickr avg R@1.
+      Selected baselines shown; the paper also reports BCT-cosine and a parameter-matched L2C
+      on every domain.
+    </p>
+    <p>
+      CoSE is <strong>domain-competitive, not domain-SOTA</strong>: at α* it trails the
+      per-domain leader by 0.012–0.027 on three domains (within noise) and by 0.072 on ROCO.
+      What it buys is a distinct frontier point. LoRA's domain peaks cost up to 0.363
+      ImageNet top-1; CoSE at α = 0.5 stays within ±0.048 of frozen on every general cell.
+      And for shifted single-encoder baselines, querying a legacy index captures only 27–61%
+      of their self-gain, because query and corpus encoders drift apart — CoSE's migration
+      column equals its domain column by construction.
+    </p>
+  </section>
+
+  <section>
+    <h2>4. One checkpoint, a whole operating curve</h2>
+    <figure>
+      <img
+        src="/cose/img/alpha_sweep.png"
+        alt="Domain validation R@1 and ImageNet top-1 as a function of alpha on four domains"
+        loading="lazy"
+      />
+      <figcaption>
+        Sweeping α on a single CoSE checkpoint. Red: domain val i2t R@1 (left axis). Blue:
+        ImageNet top-1 (right axis). α* sits consistently below 0.5 — domain signal
+        dominates — with a val→test gap of at most 0.045.
+      </figcaption>
+    </figure>
+    <p>
+      LoRA, BCT and L2C each produce one point; CoSE exposes the full curve at deployment
+      time. The same checkpoint also supports <strong>partial branching</strong> (sharing
+      the first <em>K</em> layers cuts forward overhead from 2× to about 1.5× at
+      <em>K</em> = <em>L</em>/2 for ≤ 0.04 R@1 on three of four domains) and
+      <strong>Matryoshka truncation</strong> of <em>z</em><sub>new</sub> for cheaper storage.
+      The legacy <em>z</em><sub>old</sub> slice is preserved in every variant.
+    </p>
+  </section>
+
+  <section>
+    <h2>5. Why train jointly?</h2>
+    <p>
+      A natural baseline is to ensemble the frozen model's score with a separately trained
+      LoRA. It does not work as a substitute: the val-tuned ensemble weight collapses to
+      α ≤ 0.05 on three of four domains, essentially recovering LoRA along with its general
+      drift. A standard LoRA is a low-rank perturbation of the base (cos ≈ 0.85), so the two
+      branches make the same mistakes and averaging is redundant.
+    </p>
+    <figure>
+      <img
+        src="/cose/img/pareto_ensemble.png"
+        alt="Alpha-swept Pareto curves of CoSE versus a Frozen+LoRA score ensemble on four domains"
+        loading="lazy"
+      />
+      <figcaption>
+        α-swept trade-off between domain R@1 and general R@1 for CoSE (red) and a
+        Frozen+LoRA score ensemble (blue). Diamonds mark each method's val-selected α*.
+      </figcaption>
+    </figure>
+    <p>
+      The standalone InfoNCE on <em>z</em><sub>new</sub> is what makes CoSE different. It
+      forces the side channel to be retrieval-valid on its own, which emergently places
+      <em>z</em><sub>new</sub> at cos ≈ 0.5 to <em>z</em><sub>old</sub> — partially
+      decorrelated, so blending behaves like an ensemble. Removing that term (HAN extended,
+      seed 0) collapses α = 0.1 retrieval from 0.489 to 0.185 and z<sub>old</sub>/z<sub>new</sub>
+      overlap@1 from 26.0% to 2.4%.
+    </p>
+  </section>
+
+  <section>
+    <h2>Takeaway</h2>
+    <p>
+      When existing indices are large and re-indexing is costly, CoSE offers a
+      backward-compatible route to domain adaptation that keeps general retrieval intact.
+      The base encoder is never modified, α = 1 recovers the legacy ranking exactly, and
+      α &lt; 1 adds a complementary domain score without rewriting old coordinates — so
+      migration becomes a gradual α-sweep instead of a hard cutover.
+    </p>
+    <p>
+      <strong>Scope.</strong> CoSE does not eliminate re-embedding: for α &lt; 1,
+      <em>z</em><sub>new</sub> must still be computed per document. Full branching costs 2×
+      forward compute and 2× embedding width, reducible but not to zero. Each run
+      specializes <em>z</em><sub>new</sub> to one domain, and all experiments use
+      Qwen3-VL-Embedding as the base encoder. Where latency, storage, or pure peak-domain
+      accuracy dominate, single-embedding methods are cheaper.
+    </p>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@inproceedings&#123;han2026cose,
+  title     = &#123;You CAN Teach an Old Model New Tricks: Domain Adaptation via Complementary Subspace Expansion&#125;,
+  author    = &#123;Han, Donghoon and Moon, SungHyun and Lee, SeungJae&#125;,
+  booktitle = &#123;Advances in Neural Information Processing Systems (NeurIPS)&#125;,
+  year      = &#123;2026&#125;,
+  note      = &#123;To appear&#125;
+&#125;</pre>
+  </section>
+</PaperLayout>

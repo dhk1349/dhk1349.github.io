@@ -6,6 +6,10 @@ export type NewsItem = {
 export const news: NewsItem[] = [
   {
     date: 'Sep 2026',
+    body: 'One paper accepted to <a href="https://neurips.cc/Conferences/2026">NeurIPS 2026</a> — <a href="/cose">CoSE</a>: backward-compatible domain adaptation via complementary subspace expansion. arXiv and code coming soon.',
+  },
+  {
+    date: 'Sep 2026',
     body: 'One paper accepted to <a href="https://2026.emnlp.org/">EMNLP 2026</a> (Main Conference) — see the <a href="/geometric-bottleneck">project page</a>.',
   },
   {
