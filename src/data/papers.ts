@@ -1,5 +1,5 @@
 export type Author = { name: string; href?: string; me?: boolean; equal?: boolean };
-export type Link = { label: string; href: string };
+export type Link = { label: string; href?: string };
 
 export type Paper = {
   id: string;
@@ -31,13 +31,39 @@ const EUNHWAN = {
 
 export const papers: Paper[] = [
   {
+    id: 'ngram-memories',
+    title: 'N-Gram Memories at Two Bits: Quantizing Lookup Tables in Large Language Models',
+    authors: [
+      ME,
+      { name: 'Minseop Jung' },
+      { name: 'Dong Woo Kwak' },
+      { name: 'SeungJae Lee' },
+      { name: 'Junhoo Lee' },
+    ],
+    venue: 'Preprint',
+    venueShort: 'Preprint',
+    year: 2026,
+    links: [
+      { label: 'project', href: '/ngram-memories' },
+      { label: 'arXiv', href: 'https://arxiv.org/abs/2610.21810' },
+      { label: 'model (coming soon)' },
+    ],
+    abstract:
+      'Conditional Program stores each n-gram memory row as a two-bit trellis code plus a norm-restoring scale, decoding only the rows an input requests; it lowers output KL by 41–63% vs. 2-bit RTN and shrinks DeepSeek\'s table from 203 GB to 51 GB.',
+    imageBefore: '/images/cp_before.png',
+    imageAfter: '/images/cp_after.png',
+  },
+  {
     id: 'cose',
     title: 'You CAN Teach an Old Model New Tricks: Domain Adaptation via Complementary Subspace Expansion',
     authors: [ME, { name: 'SungHyun Moon' }, { name: 'SeungJae Lee' }],
     venue: 'NeurIPS 2026',
     venueShort: 'NeurIPS',
     year: 2026,
-    links: [{ label: 'project', href: '/cose' }],
+    links: [
+      { label: 'project', href: '/cose' },
+      { label: 'arXiv (coming soon)' },
+    ],
     abstract:
       'CoSE leaves the deployed embedding structurally untouched and appends a jointly trained LoRA side channel, so legacy indices stay valid while a single α knob trades general retention for domain retrieval.',
     imageBefore: '/images/cose_before.png',

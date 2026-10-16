@@ -5,6 +5,10 @@ export type NewsItem = {
 
 export const news: NewsItem[] = [
   {
+    date: 'Oct 2026',
+    body: 'New preprint on <a href="/ngram-memories">quantizing n-gram lookup tables in LLMs to two bits</a> — Conditional Program cuts DeepSeek\'s table from 203 GB to 51 GB. Model release coming soon.',
+  },
+  {
     date: 'Sep 2026',
     body: 'One paper accepted to <a href="https://neurips.cc/Conferences/2026">NeurIPS 2026</a> — <a href="/cose">CoSE</a>: backward-compatible domain adaptation via complementary subspace expansion. arXiv and code coming soon.',
   },

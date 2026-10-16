@@ -1,0 +1,251 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Donghoon Han', href: 'https://dhk1349.github.io/', affiliation: 'Dnotitia', me: true },
+  { name: 'Minseop Jung', affiliation: 'Dnotitia' },
+  { name: 'Dong Woo Kwak', affiliation: 'Dnotitia' },
+  { name: 'SeungJae Lee', affiliation: 'Dnotitia' },
+  { name: 'Junhoo Lee', affiliation: 'KAIST' },
+];
+
+const links = [
+  { label: 'arXiv', href: 'https://arxiv.org/abs/2610.21810', meta: '2610.21810' },
+  { label: 'PDF', href: 'https://arxiv.org/pdf/2610.21810' },
+  { label: 'Model', meta: 'coming soon' },
+];
+---
+
+<PaperLayout
+  title="N-Gram Memories at Two Bits"
+  subtitle="Quantizing Lookup Tables in Large Language Models"
+  venue="Preprint · 2026"
+  authors={authors}
+  links={links}
+  description="Conditional Program (CP) compresses the n-gram lookup tables of conditional-memory LLMs to two bits per value while keeping every row independently decodable, cutting DeepSeek's table from 203 GB to 51 GB."
+>
+  <section>
+    <figure>
+      <img
+        src="/ngram-memories/img/overview.png"
+        alt="Conditional Program overview: input addresses select independent row records, each holding a trellis code and a local scale; a shared decoder reconstructs the row and the scale restores its norm"
+      />
+      <figcaption>
+        <strong>Conditional Program (CP).</strong> An input selects row addresses in the
+        compressed memory. Each record contains a trellis code and a bf16 scale; a shared
+        decoder reconstructs the vector, and the scale restores its norm before the existing
+        readout. (a) Offline, the encoder selects a low-error trellis path and stores its
+        code with the norm-restoring scale. (b) Online, only addressed records are fetched,
+        decoded and scaled.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      Conditional memory expands language-model capacity through selective lookup, but the
+      full embedding table must remain available for every possible input. We introduce
+      <strong>Conditional Program (CP)</strong>, a compressed representation that
+      reconstructs only the rows an input requests. CP represents each row by a short code
+      and a local scale, with a reconstruction program shared across the table. We
+      instantiate this representation with a Gaussian trellis, norm restoration and
+      independently decodable row records. CP's two-bit code lowers output KL by 41–63%
+      relative to 2-bit round-to-nearest. Analysis across three trained n-gram memory
+      families shows that Gaussian-like coordinate statistics coexist with learned
+      relationships among rows; at matched storage budgets, the shared trellis outperforms
+      the fitted codebooks and low-rank residual variants we test. For DeepSeek, it reduces
+      table storage from 203 GB to 51 GB, leaving room for larger workloads when the table
+      is kept on GPU.
+    </p>
+  </section>
+
+  <section>
+    <h2>Key numbers</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">203 → 51 GB</div>
+        <div class="stat-label">DeepSeek table storage</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">41–63%</div>
+        <div class="stat-label">Lower output KL vs. 2-bit RTN</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4–8×</div>
+        <div class="stat-label">Smaller tables at two bits</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">10.78 → 6.54 ms</div>
+        <div class="stat-label">Host-memory lookup, 4k-token prefill</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>1. The problem: a huge table, read a few rows at a time</h2>
+    <p>
+      Conditional memory adds capacity without a proportional increase in per-token
+      compute: a model hashes input n-grams into row addresses and reads only those rows
+      from a large embedding table. DeepSeek-V4.1-Flash, Qwen3.8-Flash-Next and
+      LongCat-Flash-Lite all carry such tables — 202.7 GB, 102.4 GB and 62.8 GB
+      respectively. Moving them from GPU to host memory changes where that cost is paid
+      without reducing it.
+    </p>
+    <p>
+      Weight quantization methods are built for dense matrices. A lookup table is
+      different: storage must shrink across the <em>whole</em> table, but each request
+      touches only a handful of rows. A format that couples rows inside larger tiles
+      saves bytes yet forces the runtime to fetch and decode unrelated data on every
+      lookup.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Conditional Program</h2>
+    <p>
+      CP stores each row <em>e<sub>i</sub></em> as a short code <em>c<sub>i</sub></em> and a
+      local scale <em>α<sub>i</sub></em>, and reconstructs it with a decoder shared by the
+      whole table: <em>ê<sub>i</sub></em> = <em>α<sub>i</sub></em> · <em>f</em>(<em>c<sub>i</sub></em>).
+      Three design choices follow from the access pattern and the row statistics.
+    </p>
+    <ul>
+      <li>
+        <strong>Shared Gaussian trellis.</strong> Normalized rows accumulate many small,
+        weakly dependent training contributions, so their coordinates look approximately
+        Gaussian. CP encodes them in their stored coordinates with a Gaussian HYB bitshift
+        trellis (tail-biting), without an extra rotation.
+      </li>
+      <li>
+        <strong>Norm restoration.</strong> Instead of the least-squares scale, which
+        shrinks rows whose direction is imperfectly decoded, CP sets
+        <em>α<sub>i</sub></em> = ‖<em>e<sub>i</sub></em>‖ / ‖<em>f</em>(<em>c<sub>i</sub></em>)‖,
+        preserving the magnitude the model consumes.
+      </li>
+      <li>
+        <strong>Independent row records.</strong> Each code and its bf16 scale form one
+        addressable record. A fused kernel fetches and decodes only the requested rows
+        and hands them to the unchanged readout in the original lookup order.
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Downstream quality at two bits</h2>
+    <p>
+      We compress only the lookup tables and evaluate 40 tasks across commonsense,
+      knowledge, reading comprehension, multilingual understanding, and math and code.
+      Removing the table shows how much each model relies on it; CP keeps most of that
+      benefit at roughly a quarter to an eighth of the storage.
+    </p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Bits</th>
+            <th>Table GB</th>
+            <th>PopQA</th>
+            <th>TriviaQA</th>
+            <th>GSM8K</th>
+            <th>Overall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">DeepSeek — Original</td><td>—</td><td>202.7</td><td>44.2</td><td>87.9</td><td>96.4</td><td>79.8</td></tr>
+          <tr><td class="method">w/o memory</td><td>—</td><td>0.0</td><td>20.9</td><td>75.0</td><td>95.8</td><td>73.5</td></tr>
+          <tr><td class="method">RTN</td><td>2</td><td>61.4</td><td>43.1</td><td>87.8</td><td>97.0</td><td>79.7</td></tr>
+          <tr class="highlight"><td class="method">CP</td><td>2</td><td>50.7</td><td>43.7</td><td>87.7</td><td>96.4</td><td>79.9</td></tr>
+          <tr class="divider"><td class="method">Qwen — Original</td><td>—</td><td>102.4</td><td>36.3</td><td>82.3</td><td>87.6</td><td>75.6</td></tr>
+          <tr><td class="method">w/o memory</td><td>—</td><td>0.0</td><td>26.6</td><td>73.4</td><td>83.0</td><td>72.4</td></tr>
+          <tr><td class="method">RTN</td><td>2</td><td>15.4</td><td>35.1</td><td>82.0</td><td>86.4</td><td>75.4</td></tr>
+          <tr class="highlight"><td class="method">CP</td><td>2</td><td>13.4</td><td>36.4</td><td>82.2</td><td>86.8</td><td>75.5</td></tr>
+          <tr class="divider"><td class="method">LongCat — Original</td><td>—</td><td>62.8</td><td>26.6</td><td>68.5</td><td>90.8</td><td>68.2</td></tr>
+          <tr><td class="method">w/o memory</td><td>—</td><td>0.0</td><td>11.8</td><td>31.2</td><td>13.0</td><td>30.5</td></tr>
+          <tr><td class="method">RTN</td><td>2</td><td>9.8</td><td>26.1</td><td>67.5</td><td>88.8</td><td>66.7</td></tr>
+          <tr class="highlight"><td class="method">CP</td><td>2</td><td>8.1</td><td>26.1</td><td>68.3</td><td>89.0</td><td>67.3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Selected columns from Table 1 of the paper (scores 0–100; Overall equally weights
+      five task-group means). Table GB includes scales and offsets. The paper also reports
+      RTN 3-bit, QTIP and CP at 1.5 bits, and all 40 tasks in the appendix.
+    </p>
+  </section>
+
+  <section>
+    <h2>4. Output fidelity across storage budgets</h2>
+    <figure>
+      <img
+        src="/ngram-memories/img/kl_frontier.png"
+        alt="Table size versus output KL on DeepSeek, Qwen and LongCat; the CP curve lies below and left of RTN, QTIP and four-bit float formats"
+        loading="lazy"
+      />
+      <figcaption>
+        Table size versus six-domain geometric-mean output KL (log scale); lower and
+        further left is better. CP labels include per-row scales.
+      </figcaption>
+    </figure>
+    <p>
+      Task scores can hide behavioral drift, so we also measure per-token
+      KL(<em>p</em><sub>orig</sub> ‖ <em>p</em><sub>quant</sub>) over six text domains. At
+      two bits CP lowers KL by <strong>41–63%</strong> relative to RTN and by a further
+      3–9% relative to a QTIP-style trellis with one scale per table. CP at 2.5 bits
+      approaches RTN 3-bit with less storage, and at higher rates it beats NVFP4 and
+      MXFP4 while using less memory.
+    </p>
+  </section>
+
+  <section>
+    <h2>5. What matters in the design</h2>
+    <p>
+      <strong>A shared trellis beats fitted codebooks.</strong> Frequently read rows do
+      share structure — 16 fitted directions capture 10–33% of their energy against a
+      6–10% Gaussian reference. Yet at a matched 2.10 bpp on Qwen, the shared trellis
+      (KL 0.0198) outperforms vector quantizers fitted to the table (0.0226–0.0238), and
+      explicit mean or principal-component terms buy little for the storage they cost.
+    </p>
+    <p>
+      <strong>Restore the norm, not the least-squares fit.</strong> With identical codes
+      and storage, the norm-restoring scale gives lower output KL than the
+      least-squares scale on all three models (e.g. 0.0327 vs. 0.0349 on Qwen, 0.0426
+      vs. 0.0462 on LongCat). Minimizing reconstruction error is not the same as
+      preserving model behavior. Within-row rotation shows no resolved benefit.
+    </p>
+  </section>
+
+  <section>
+    <h2>6. Serving</h2>
+    <p>
+      <strong>Selective lookup.</strong> Replaying 4,096-token DeepSeek lookups on one
+      H200, CP's row records complete in 0.190 ms from HBM versus 0.221 ms for a
+      tile-window decoder over QTIP's tiled layout, and in <strong>6.54 ms versus
+      10.78 ms</strong> from pinned host DRAM over PCIe.
+    </p>
+    <p>
+      <strong>Workload capacity.</strong> On four H200s, the DeepSeek table drops from
+      50.7 GB to 12.7 GB per GPU. Prefill for 8 × 4k tokens falls from 64.66 s to 13.27 s,
+      and a 512-sequence decode batch and a 64k-token prefill that run out of memory
+      with FP8 tables now fit. On eight GPUs, CP frees 19.0 GB per GPU, raising the
+      largest tested decode batch from 1,024 to at least 2,048 and prefill from 96k to
+      at least 128k tokens.
+    </p>
+    <p>
+      <strong>Scope.</strong> Results cover post-training compression of three models
+      with hashed lookup tables and may not extend to other memory architectures. When
+      GPU memory is already sufficient, complete inference steps show little speed
+      improvement in our implementation.
+    </p>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@article&#123;han2026ngram,
+  title   = &#123;N-Gram Memories at Two Bits: Quantizing Lookup Tables in Large Language Models&#125;,
+  author  = &#123;Han, Donghoon and Jung, Minseop and Kwak, Dong Woo and Lee, SeungJae and Lee, Junhoo&#125;,
+  journal = &#123;arXiv preprint arXiv:2610.21810&#125;,
+  year    = &#123;2026&#125;
+&#125;</pre>
+  </section>
+</PaperLayout>
