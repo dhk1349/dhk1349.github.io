@@ -68,7 +68,10 @@ export const papers: Paper[] = [
     venue: 'Preprint',
     venueShort: 'Preprint',
     year: 2026,
-    links: [{ label: 'arXiv', href: 'https://arxiv.org/abs/2610.21434' }],
+    links: [
+      { label: 'project', href: '/pav' },
+      { label: 'arXiv', href: 'https://arxiv.org/abs/2610.21434' },
+    ],
     abstract:
       "PAV predicts the consequences of a candidate action prefix in the VLA's own representation space and scores whether it stays compatible with task success, choosing how much of each action chunk to execute; it improves success-query trade-offs for π0 and π0.5 on LIBERO, RoboTwin 2.0 and real-world manipulation.",
     imageBefore: '/images/pav_before.png',
@@ -90,7 +93,10 @@ export const papers: Paper[] = [
     venue: 'Preprint',
     venueShort: 'Preprint',
     year: 2026,
-    links: [{ label: 'arXiv', href: 'https://arxiv.org/abs/2610.19957' }],
+    links: [
+      { label: 'project', href: '/cf-prune' },
+      { label: 'arXiv', href: 'https://arxiv.org/abs/2610.19957' },
+    ],
     abstract:
       'CF-Prune is a training-free method that prunes future-frame tokens in world action models using instruction and action attention, keeping dense computation in precision phases; at 35% pruning it speeds up inference by 1.19–1.27× while improving task success.',
     imageBefore: '/images/cfprune_before.png',

@@ -1,0 +1,284 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Minkyu Kim', affiliation: 'SNU' },
+  { name: 'Junhoo Lee', affiliation: 'KAIST' },
+  { name: 'Seungyeon Kim', affiliation: 'SNU' },
+  { name: 'Suhyun Jeon', affiliation: 'SNU' },
+  { name: 'Baekseung Kim', affiliation: 'SNU' },
+  { name: 'Donghoon Han', href: 'https://dhk1349.github.io/', affiliation: 'Dnotitia', me: true },
+  { name: 'Nojun Kwak', href: 'http://mipal.snu.ac.kr/index.php/Nojun_Kwak', affiliation: 'SNU' },
+];
+
+const links = [
+  { label: 'arXiv', href: 'https://arxiv.org/abs/2610.21434', meta: '2610.21434' },
+];
+---
+
+<PaperLayout
+  title="Policy-Aligned Predictive Verification"
+  subtitle="for Adaptive VLA Action-Chunk Execution"
+  venue="Preprint · 2026"
+  authors={authors}
+  links={links}
+  description="PAV decides how much of a VLA's action chunk to execute by predicting each prefix's consequence in the policy's own representation space and verifying that successful continuation remains possible."
+>
+  <section>
+    <figure>
+      <img
+        src="/pav/img/teaser.png"
+        alt="Generation stability and prediction agreement stay high through a missed grasp and task failure, while proposal validity drops and triggers earlier replanning that leads to success"
+      />
+      <figcaption>
+        Generation stability (a) and prediction agreement (b) can remain high despite a
+        missed grasp and task failure. Proposal validity (c) guides earlier replanning,
+        leading to success in this example.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      Vision-language-action (VLA) policies generate action sequences that reduce repeated
+      inference, but deciding how much of each sequence to execute is critical to task
+      success. Existing adaptive methods make this decision using generation stability or
+      prediction agreement, yet these signals do not establish whether executing a
+      candidate prefix preserves the ability to complete the task. We introduce a
+      <strong>policy-aligned predictive verifier (PAV)</strong> that anticipates the
+      consequences of candidate action prefixes and evaluates their compatibility with
+      successful continuation before execution. Rather than using future prediction to
+      generate actions, our method evaluates existing proposals in the VLA's internal
+      task-conditioned representation space. To learn local judgments from terminal task
+      outcomes, we combine trajectory-level survival supervision with a localization prior
+      that preserves useful behavior within failed rollouts. The resulting validity scores
+      guide execution-horizon selection. Evaluations with π<sub>0</sub> and
+      π<sub>0.5</sub> across LIBERO, RoboTwin 2.0, and real-world manipulation show
+      improved success–query trade-offs. These findings point toward a different role for
+      future prediction in robotics, using it to assess how far to trust a policy's
+      proposed actions rather than to generate new ones.
+    </p>
+  </section>
+
+  <section>
+    <h2>Key numbers</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">+7.5 pp</div>
+        <div class="stat-label">LIBERO success vs. h = 5 (π<sub>0.5</sub>, H = 50)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">−63%</div>
+        <div class="stat-label">VLA queries in the same setting</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">74.4%</div>
+        <div class="stat-label">Real-world success (best fixed: 41.1%)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">≤ 1.24%</div>
+        <div class="stat-label">Verifier compute vs. action generation</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>1. The problem: how long to trust an action chunk</h2>
+    <p>
+      VLA policies such as π<sub>0</sub> output a chunk of <em>H</em> future actions per
+      query. Executing the whole chunk saves inference but delays feedback, so systems
+      usually execute only a prefix of length <em>h</em> and replan. Picking <em>h</em>
+      well is the crux: too short wastes queries, too long lets errors accumulate.
+    </p>
+    <p>
+      Existing adaptive methods pick <em>h</em> from <strong>generation stability</strong>
+      (do the actions regenerate consistently?) or <strong>prediction agreement</strong>
+      (do predicted and observed dynamics match?). Neither establishes whether executing a
+      prefix still leaves the task completable — a proposal can be consistently generated
+      and accurately predicted, yet still miss the grasp.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Proposal validity, predicted and verified</h2>
+    <figure>
+      <img
+        src="/pav/img/method.png"
+        alt="PAV pipeline: the VLA representation and proposed action chunk feed a future-representation predictor; a validity verifier scores each step and the accumulated prefix score selects how many actions to execute"
+        loading="lazy"
+      />
+      <figcaption>
+        The predictor uses the VLA representation and proposed actions to predict future
+        policy representations. The verifier estimates local validity, which is accumulated
+        and normalized to select an execution horizon. The robot executes the selected
+        prefix and replans.
+      </figcaption>
+    </figure>
+    <p>
+      PAV targets <strong>proposal validity</strong> <em>V<sub>t</sub></em>(<em>h</em>): the
+      probability that successful continuation remains possible throughout the first
+      <em>h</em> actions. Because a compatible prefix has compatible predecessors, validity
+      factorizes step by step, and each step splits into prediction and verification.
+    </p>
+    <ul>
+      <li>
+        <strong>Predict in policy space.</strong> A predictor maps the VLA's
+        task-conditioned representation and an action prefix to the representation the
+        policy would see after executing it, trained with a cosine alignment loss plus an
+        action-swap margin so that predictions depend on the actions.
+      </li>
+      <li>
+        <strong>Verify from task outcomes.</strong> A verifier scores local validity for
+        each predicted step; the running product estimates <em>V<sub>t</sub></em>(<em>h</em>).
+        Successful rollouts raise every factor, failed rollouts lower only the product, and
+        a localization prior concentrates the blame on few steps so that valid behavior
+        inside failed rollouts is not penalized.
+      </li>
+      <li>
+        <strong>Select the horizon.</strong> At inference, candidate prefixes are checked
+        in ascending order and execution stops at the first length-normalized score below a
+        threshold.
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Results</h2>
+    <figure>
+      <img
+        src="/pav/img/settings.png"
+        alt="Real-world tasks Press Button, Stack Cubes and Place Cube in Tray, and simulation environments from LIBERO and RoboTwin 2.0"
+        loading="lazy"
+      />
+      <figcaption>
+        Evaluation settings: three real-world Franka tasks, LIBERO (single-arm) and
+        RoboTwin 2.0 (dual-arm).
+      </figcaption>
+    </figure>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>LIBERO, π<sub>0.5</sub> (H = 50)</th>
+            <th>Spatial</th>
+            <th>Object</th>
+            <th>Goal</th>
+            <th>Long</th>
+            <th>Avg.</th>
+            <th>Queries ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">h = 5</td><td>91.8</td><td>94.8</td><td>84.8</td><td>77.2</td><td>87.15</td><td>38.1</td></tr>
+          <tr><td class="method">h = 10</td><td>89.8</td><td>92.8</td><td>88.0</td><td>79.2</td><td>87.45</td><td>19.2</td></tr>
+          <tr><td class="method">h = 50</td><td>53.2</td><td>55.0</td><td>72.4</td><td>46.6</td><td>56.80</td><td>5.4</td></tr>
+          <tr><td class="method">AutoHorizon</td><td>95.6</td><td>97.2</td><td>92.4</td><td>92.6</td><td>94.45</td><td>12.7</td></tr>
+          <tr class="highlight"><td class="method">PAV</td><td>96.8</td><td>98.8</td><td>91.8</td><td>91.2</td><td>94.65</td><td>14.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Success (%) over 50 trials per task and mean VLA queries per episode. The paper also
+      reports π<sub>0</sub> (H = 50) and π<sub>0.5</sub> (H = 10), where PAV again has the
+      highest average success (94.30% and 98.10%), plus A3, DVAC and VLA-Corrector
+      references.
+    </p>
+    <p>
+      <strong>LIBERO.</strong> PAV has the highest average success in all three policy–chunk
+      settings. The clearest gain is with π<sub>0.5</sub> at H = 50: +7.50 pp over
+      h = 5 with 63.3% fewer queries.
+    </p>
+    <p>
+      <strong>RoboTwin 2.0.</strong> With π<sub>0.5</sub> (H = 32), PAV reaches 54.13% on
+      DVAC's Selected 16 tasks, above the best fixed horizon (47.88%) and DVAC (41.6%), and
+      58.64% on all 50 tasks versus 55.76% for the best fixed horizon at similar query
+      counts.
+    </p>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Real world (π<sub>0.5</sub>)</th>
+            <th>Place Cube</th>
+            <th>Stack</th>
+            <th>Press</th>
+            <th>Avg.</th>
+            <th>Replans ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">h = 5</td><td>16.7</td><td>10.0</td><td>23.3</td><td>16.7</td><td>69.58</td></tr>
+          <tr><td class="method">h = 10</td><td>66.7</td><td>16.7</td><td>40.0</td><td>41.1</td><td>36.54</td></tr>
+          <tr><td class="method">h = 30</td><td>23.3</td><td>43.3</td><td>53.3</td><td>40.0</td><td>11.97</td></tr>
+          <tr><td class="method">h = 50</td><td>26.7</td><td>33.3</td><td>50.0</td><td>36.7</td><td>6.91</td></tr>
+          <tr class="highlight"><td class="method">PAV</td><td>80.0</td><td>66.7</td><td>76.7</td><td>74.4</td><td>12.87</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Success (%) over 30 trials per task on a 7-DoF Franka Panda, with mean replanning
+      counts per episode.
+    </p>
+    <p>
+      <strong>Real world.</strong> PAV is best on all three tasks, averaging 74.4% versus
+      41.1% for the strongest fixed horizon. At a replanning count similar to h = 30
+      (12.87 vs. 11.97), varying the execution length lifts success from 40.0% to 74.4%.
+    </p>
+  </section>
+
+  <section>
+    <h2>4. What makes it work</h2>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Variant (LIBERO, π<sub>0.5</sub>, H = 50)</th>
+            <th>Avg. success</th>
+            <th>Queries ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">Direct (no future prediction)</td><td>84.55</td><td>22.3</td></tr>
+          <tr><td class="method">Prediction in DINOv2 space</td><td>87.00</td><td>22.2</td></tr>
+          <tr class="highlight"><td class="method">PAV (prediction in policy space)</td><td>94.65</td><td>14.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      <strong>Predicting the future matters.</strong> Scoring prefixes directly from current
+      representations, with everything else fixed, loses 10.1 pp and needs more queries.
+      The predictor is genuinely action-sensitive: on held-out rollouts its prediction
+      reaches cosine 0.9401 to the observed future with the executed actions, versus 0.5304
+      with same-task swapped actions.
+    </p>
+    <p>
+      <strong>So does the space it predicts in.</strong> Predicting generic DINOv2 features
+      instead of the VLA's task-conditioned representation drops success to 87.00%.
+    </p>
+    <p>
+      <strong>It is cheap.</strong> Verifier GPU compute takes 0.90–2.49 ms per query, or
+      0.45–1.24% of action-generation time across the four settings measured.
+    </p>
+  </section>
+
+  <section>
+    <h2>Takeaway</h2>
+    <p>
+      Effective action-chunk execution depends not only on generating coherent actions but
+      on deciding how long to commit to them. PAV uses future prediction to assess how far
+      to trust a policy's proposal — in the same representation space that generated it —
+      rather than to generate new actions.
+    </p>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@article&#123;kim2026pav,
+  title   = &#123;Policy-Aligned Predictive Verification for Adaptive VLA Action-Chunk Execution&#125;,
+  author  = &#123;Kim, Minkyu and Lee, Junhoo and Kim, Seungyeon and Jeon, Suhyun and Kim, Baekseung and Han, Donghoon and Kwak, Nojun&#125;,
+  journal = &#123;arXiv preprint arXiv:2610.21434&#125;,
+  year    = &#123;2026&#125;
+&#125;</pre>
+  </section>
+</PaperLayout>

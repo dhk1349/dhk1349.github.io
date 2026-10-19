@@ -1,0 +1,288 @@
+---
+import PaperLayout from '../../layouts/PaperLayout.astro';
+
+const authors = [
+  { name: 'Baekseung Kim', affiliation: 'SNU' },
+  { name: 'Junhoo Lee', affiliation: 'KAIST' },
+  { name: 'Sohyeon Hong', affiliation: 'SNU' },
+  { name: 'Suhyun Jeon', affiliation: 'SNU' },
+  { name: 'Minkyu Kim', affiliation: 'SNU' },
+  { name: 'Seungyeon Kim', affiliation: 'SNU' },
+  { name: 'Donghoon Han', href: 'https://dhk1349.github.io/', affiliation: 'Dnotitia', me: true },
+  { name: 'Nojun Kwak', href: 'http://mipal.snu.ac.kr/index.php/Nojun_Kwak', affiliation: 'SNU' },
+];
+
+const links = [
+  { label: 'arXiv', href: 'https://arxiv.org/abs/2610.19957', meta: '2610.19957' },
+];
+---
+
+<PaperLayout
+  title="Complementary Future Token Pruning"
+  subtitle="for World Action Models"
+  venue="Preprint · 2026"
+  authors={authors}
+  links={links}
+  description="CF-Prune is a training-free method that prunes future-frame tokens in world action models, using instruction and action attention from the first denoising pass to keep only what action generation needs."
+>
+  <section>
+    <figure>
+      <img
+        src="/cf-prune/img/overview.png"
+        alt="CF-Prune overview: instruction and action attention from the first denoising step build a pruning mask over future-video tokens, and phase identification switches pruning off during precision phases"
+      />
+      <figcaption>
+        Overview of CF-Prune. In the first denoising step (<em>k</em> = 1), instruction and
+        action attention select which future-video tokens to keep; phase identification
+        decides whether to prune for the remaining steps (<em>k</em> = 2, …, <em>K</em>).
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      World action models (WAMs) jointly predict future visual states and robot actions,
+      but processing dense future-frame tokens incurs substantial inference latency. We
+      propose <strong>CF-Prune</strong>, a training-free framework for pruning
+      future-frame tokens in pretrained WAMs. Our key insight is that future visual
+      predictions support action generation and therefore need not preserve every visual
+      detail required for high-fidelity video synthesis. CF-Prune combines instruction and
+      action attention to identify task-relevant tokens during the initial denoising
+      forward pass, even when future-frame and action representations remain highly noisy.
+      An entropy-based phase identification mechanism further retains dense computation
+      during precision phases to mitigate pruning-induced performance degradation.
+      Experiments on RoboLab, RoboCasa, and real-world manipulation tasks demonstrate
+      consistent inference speedups. At a 35% pruning ratio, CF-Prune achieves average
+      speedups of 1.19–1.27× while improving task success rates. At a 50% pruning ratio, it
+      achieves 1.29–1.33× average speedups on both simulation benchmarks, with overall
+      success rates within 1.0 percentage point of the baseline.
+    </p>
+  </section>
+
+  <section>
+    <h2>Key numbers</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Extra training steps</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">1.19–1.27×</div>
+        <div class="stat-label">Average speedup at 35% pruning</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">85.3 → 90.7%</div>
+        <div class="stat-label">Real-world success at 35%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">1.33×</div>
+        <div class="stat-label">RoboLab speedup at 50%</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>1. The problem: future frames dominate the compute</h2>
+    <div class="split">
+      <figure class="narrow">
+        <img
+          src="/cf-prune/img/motivation.png"
+          alt="Dense WAM keeps every future-video token at full token cost, while future-token pruning keeps only task-relevant tokens at reduced cost and still predicts the actions"
+          loading="lazy"
+        />
+        <figcaption>Rethinking future-video generation for action prediction.</figcaption>
+      </figure>
+      <div>
+        <p>
+          World action models build on video diffusion backbones and denoise future video
+          and robot actions together. After VAE compression, a future video is still a
+          spatiotemporal grid of <em>T<sub>v</sub></em> × <em>H<sub>v</sub></em> ×
+          <em>W<sub>v</sub></em> tokens, far outnumbering the <em>H<sub>a</sub></em> action
+          tokens and dominating every denoising step.
+        </p>
+        <p>
+          But a WAM uses future frames as an intermediate reference for action generation,
+          not as a video to show anyone. They must keep task-relevant semantics and
+          dynamics, not every visual detail — so a dense grid is redundant for action
+          prediction.
+        </p>
+        <p>
+          Pruning these tokens is not straightforward: they are the model's outputs,
+          denoised from Gaussian noise, so their relevance is hard to judge early, and
+          judging it late forfeits the speedup. Existing WAM acceleration reduces denoising
+          steps or redesigns the model, which requires retraining.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Method</h2>
+    <p>
+      CF-Prune makes its token selection once, inside the initial denoising forward pass,
+      and applies it for the rest of denoising.
+    </p>
+    <ul>
+      <li>
+        <strong>Instruction-based spatial prior.</strong> Observation tokens carry no
+        diffusion noise, so observation-to-instruction attention marks instruction-relevant
+        regions of the scene. The scoring layer is the one whose attention is most
+        concentrated (lowest normalized entropy).
+      </li>
+      <li>
+        <strong>Action-based visual relevance.</strong> Action-to-future attention measures
+        which regions the action tokens rely on — per frame for the moving wrist camera,
+        shared across frames for fixed third-person views. A 5 × 5 Gaussian blur keeps the
+        selection spatially contiguous.
+      </li>
+      <li>
+        <strong>Complementary selection.</strong> For pruning ratio α, keep the top
+        (1 − α)/2 tokens by action relevance, then another (1 − α)/2 by instruction
+        relevance among the rest.
+      </li>
+      <li>
+        <strong>Phase identification.</strong> An entropy contrast across camera views and
+        early vs. late actions detects precision phases near object interaction; pruning is
+        switched off there and applied only in coarse phases.
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Results</h2>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>RoboLab</th>
+            <th>Simple</th>
+            <th>Moderate</th>
+            <th>Complex</th>
+            <th>Overall</th>
+            <th>Speedup</th>
+            <th>FLOPs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">Dense</td><td>40.3</td><td>34.1</td><td>27.6</td><td>36.5</td><td>1.00×</td><td>100%</td></tr>
+          <tr><td class="method">SpecPrune-VLA (obs + future)</td><td>36.9</td><td>28.2</td><td>23.5</td><td>32.2</td><td>1.23×</td><td>77.5%</td></tr>
+          <tr><td class="method">SP-VLA (obs + future)</td><td>37.5</td><td>32.3</td><td>23.5</td><td>33.8</td><td>1.24×</td><td>77.5%</td></tr>
+          <tr><td class="method">Sparse VideoGen</td><td>21.9</td><td>16.9</td><td>7.1</td><td>18.2</td><td>0.97×</td><td>104.7%</td></tr>
+          <tr class="highlight"><td class="method">CF-Prune, α = 35%</td><td>43.0</td><td>33.6</td><td>28.2</td><td>37.8</td><td>1.23×</td><td>73.2%</td></tr>
+          <tr><td class="method">CF-Prune, α = 50%</td><td>40.3</td><td>32.8</td><td>24.7</td><td>35.7</td><td>1.33×</td><td>61.7%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Success (%) on 120 RoboLab tasks with Cosmos3-Nano-Policy-DROID; speedup and FLOPs
+      are averaged over all inference calls. Latency on an RTX A6000. The paper also
+      reports observation-only variants of the VLA pruning baselines.
+    </p>
+    <p>
+      <strong>RoboLab.</strong> At α = 35%, CF-Prune is 1.23× faster with 26.8% fewer FLOPs
+      and raises overall success from 36.5% to 37.8%. At α = 50% it reaches 1.33× with only
+      a 0.8 pp drop. Extending VLA pruning masks to future frames costs more success at
+      similar speed, and Sparse VideoGen's profiling overhead outweighs its savings.
+    </p>
+    <p>
+      <strong>RoboCasa.</strong> At α = 35%, CF-Prune is 1.19× faster with 15.6% fewer FLOPs
+      and lifts overall success from 65.0% to 69.0%. At α = 50% (1.29×) overall success is
+      64.0%, but navigation drops from 38.0% to 18.0%, so the effect of aggressive pruning
+      varies by task.
+    </p>
+    <figure>
+      <img
+        src="/cf-prune/img/real_world_setup.png"
+        alt="Real-world setup with a Franka arm and three cameras, and the button-pressing, pick-and-place and block-stacking tasks"
+        loading="lazy"
+      />
+      <figcaption>
+        Real-world setup and the three tasks: e-button pressing, block pick-and-place, and
+        block stacking.
+      </figcaption>
+    </figure>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Real world</th>
+            <th>Button</th>
+            <th>Pick-and-place</th>
+            <th>Stacking</th>
+            <th>Overall</th>
+            <th>Speedup</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method">Dense</td><td>84.0</td><td>92.0</td><td>80.0</td><td>85.3</td><td>1.00×</td></tr>
+          <tr class="highlight"><td class="method">CF-Prune, α = 35%</td><td>88.0</td><td>96.0</td><td>88.0</td><td>90.7</td><td>1.27×</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-caption">
+      Success (%) over 25 rollouts per task on a Franka Emika Panda with wrist, right and
+      front cameras.
+    </p>
+    <figure>
+      <img
+        src="/cf-prune/img/pruning_examples.png"
+        alt="Real-world future-token pruning masks at 35% and 50%; navy cells mark pruned positions, concentrated away from the gripper and target objects"
+        loading="lazy"
+      />
+      <figcaption>
+        Future-token pruning at 35% and 50% on recorded real-world inputs. Navy cells
+        indicate pruned positions.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>4. Ablations</h2>
+    <p>
+      <strong>Both signals are needed.</strong> At 35% pruning without phase
+      identification, instruction-only selection reaches 34.0% on RoboLab and action-only
+      30.8%; the complementary action-first selection reaches 35.3%, above instruction-first
+      ordering (34.3%).
+    </p>
+    <p>
+      <strong>Phase identification helps.</strong> Keeping dense computation in detected
+      precision phases lifts overall success from 35.3% to 37.8% while flagging only 31.4%
+      of inference calls, so the average speedup stays at 1.23×.
+    </p>
+  </section>
+
+  <section>
+    <h2>Takeaway</h2>
+    <p>
+      Treating future frames as support for action prediction, not as video to be rendered
+      faithfully, exposes redundancy that a pretrained WAM can shed at inference time. The
+      attention available in the very first, still-noisy denoising pass is enough to decide
+      which future tokens action generation needs.
+    </p>
+  </section>
+
+  <section>
+    <h2>Citation</h2>
+    <pre class="citation">@article&#123;kim2026cfprune,
+  title   = &#123;Complementary Future Token Pruning for World Action Models&#125;,
+  author  = &#123;Kim, Baekseung and Lee, Junhoo and Hong, Sohyeon and Jeon, Suhyun and Kim, Minkyu and Kim, Seungyeon and Han, Donghoon and Kwak, Nojun&#125;,
+  journal = &#123;arXiv preprint arXiv:2610.19957&#125;,
+  year    = &#123;2026&#125;
+&#125;</pre>
+  </section>
+</PaperLayout>
+
+<style>
+  .split {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .split p:first-child { margin-top: 0; }
+  @media (max-width: 640px) {
+    .split { grid-template-columns: 1fr; }
+    .split figure.narrow { max-width: 260px; margin: 0 auto; }
+  }
+</style>
